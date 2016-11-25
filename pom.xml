@@ -35,11 +35,6 @@
             </resource>
             <resource>
                 <directory>src/main/resource</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                </includes>
-                <filtering>false</filtering>
             </resource>
         </resources>
     </build>
