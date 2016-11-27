@@ -2,6 +2,8 @@ package com.telemarket.telemarketer;
 
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.services.ServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,16 +18,15 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 服务器类
  * 负责等候和处理IO事件
  */
 public class Server {
-    public static final int DEFAULT_PORT = 8080;
-    private Logger logger = Logger.getLogger("Server");
+    private static final int DEFAULT_PORT = 8080;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private InetAddress ip;
     private int port;
     private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -70,7 +71,7 @@ public class Server {
                     continue;
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, e, () -> "selector错误");
+                LOGGER.error("selector错误", e);
                 break;
             }
             Set<SelectionKey> readyKeys = selector.selectedKeys();
@@ -103,7 +104,7 @@ public class Server {
                         // 结果导致register 写事件的时候非常慢,等待了几秒。 不知道为什么
                     }
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, e, () -> "socket channel 出错了");
+                    LOGGER.error("socket channel 出错了", e);
                     key.cancel();
                     try {
                         key.channel().close();
@@ -115,7 +116,8 @@ public class Server {
     }
 
     private void init() {
-        System.out.println("初始化中...");
+        long start = System.currentTimeMillis();
+        System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
         ServerSocketChannel serverChannel;
         try {
             ServiceRegistry.registerServices();
@@ -125,10 +127,10 @@ public class Server {
             selector = Selector.open();
             serverChannel.register(selector, SelectionKey.OP_ACCEPT);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, e, () -> "初始化错误");
+            LOGGER.error("初始化错误", e);
             System.exit(1);
         }
-        System.out.println("服务器启动 http://" + ip.getHostAddress() + ":" + port + "/");
+        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", ip.getHostAddress(), port, System.currentTimeMillis() - start);
     }
 
 }

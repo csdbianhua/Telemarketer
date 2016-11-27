@@ -2,3 +2,4 @@
 target/
 telemarket.iml
 src/main/resource/rebel.xml
+logs

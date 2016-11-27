@@ -9,7 +9,7 @@ import java.util.Map;
  */
 class RequestBody {
     private Map<String, String> formMap;
-    private Map<String, MIMEData> mimeMap;
+    private Map<String, MimeData> mimeMap;
 
 
     RequestBody() {
@@ -21,7 +21,7 @@ class RequestBody {
         this.formMap = formMap;
     }
 
-    public void setMimeMap(Map<String, MIMEData> mimeMap) {
+    public void setMimeMap(Map<String, MimeData> mimeMap) {
         this.mimeMap = mimeMap;
     }
 
@@ -37,7 +37,7 @@ class RequestBody {
         return Collections.unmodifiableMap(formMap);
     }
 
-    public Map<String, MIMEData> getMimeMap() {
+    public Map<String, MimeData> getMimeMap() {
         return Collections.unmodifiableMap(mimeMap);
     }
 
@@ -45,7 +45,7 @@ class RequestBody {
         return formMap.get(key);
     }
 
-    public MIMEData mimeValue(String key) {
+    public MimeData mimeValue(String key) {
         return mimeMap.get(key);
     }
 }
