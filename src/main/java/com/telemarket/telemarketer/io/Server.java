@@ -1,5 +1,6 @@
-package com.telemarket.telemarketer;
+package com.telemarket.telemarketer.io;
 
+import com.telemarket.telemarketer.Connector;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.services.ServiceRegistry;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -18,49 +18,21 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 服务器类
- * 负责等候和处理IO事件
+ * Chen Yijie on 2016/11/27 17:14.
  */
 public class Server {
-    private static final int DEFAULT_PORT = 8080;
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private InetAddress ip;
     private int port;
     private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private Selector selector;
 
+
     public Server(InetAddress ip, int port) {
         this.ip = ip;
         this.port = port;
-    }
-
-    public static void main(String[] args) {
-        if (args.length < 1 || !args[0].equals("start")) {
-            System.out.println("Usage: start [address:port]");
-            System.exit(1);
-        }
-        InetAddress ip = null;
-        int port = 0;
-        try {
-            if (args.length == 2 && args[1].matches(".+:\\d+")) {
-                String[] address = args[1].split(":");
-                ip = InetAddress.getByName(address[0]);
-                port = Integer.valueOf(address[1]);
-            } else {
-                ip = InetAddress.getLocalHost();
-                port = DEFAULT_PORT;
-                System.out.println("未指定地址和端口,使用默认ip和端口..." + ip.getHostAddress() + ":" + port);
-            }
-        } catch (UnknownHostException e) {
-            System.out.println("请输入正确的ip");
-            System.exit(1);
-        }
-
-        Server server = new Server(ip, port);
-        server.start();
     }
 
     public void start() {
@@ -132,5 +104,4 @@ public class Server {
         }
         LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", ip.getHostAddress(), port, System.currentTimeMillis() - start);
     }
-
 }

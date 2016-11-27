@@ -35,6 +35,7 @@ public class Connector implements Runnable {
 
     @Override
     public void run() {
+        long start = System.currentTimeMillis();
         Request request = null;
         Response response;
         try {
@@ -62,7 +63,7 @@ public class Connector implements Runnable {
         attachResponse(response);
 
         assert request != null;
-        LOGGER.info(request.getMethod() + " \"" + request.getURI() + "\" " + response.getStatus().getCode());
+        LOGGER.info("{} \"{}\" {} {}ms", request.getMethod(), request.getURI(), response.getStatus().getCode(), System.currentTimeMillis() - start);
 
 
     }
