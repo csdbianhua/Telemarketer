@@ -1,14 +1,15 @@
 package com.telemarket.telemarketer.services;
 
-import com.telemarket.telemarketer.Server;
+import com.telemarket.telemarketer.context.StartArgs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 /**
@@ -16,8 +17,8 @@ import java.util.regex.Matcher;
  */
 public class ServiceRegistry {
 
-    private static final Logger logger = Logger.getLogger("ServiceRegistry");
-    private static Map<String, Service> services = new TreeMap<>(); //TODO 一直可写的话注意同步问题
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
+    private static Map<String, Service> services = Collections.synchronizedMap(new TreeMap<String, Service>()); //TODO 一直可写的话注意同步问题
 
     public static void register(String pattern, Service service) {
         services.put(pattern, service);
@@ -40,13 +41,16 @@ public class ServiceRegistry {
 
     /**
      * 注册服务
+     *
+     * @param startArgs
      */
-    public static void registerServices() {
-        URL packageUrl = Server.class.getResource("/");
+    public static void registerServices(StartArgs startArgs) {
+        Class rootClazz = startArgs.getRootClazz();
+        URL packageUrl = rootClazz.getResource("/");
         if (packageUrl == null) {
             return;
         }
-        String name = Server.class.getPackage().getName();
+        String name = rootClazz.getPackage().getName();
         registerFromPackage(name, packageUrl.getFile() + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
     }
 
@@ -56,6 +60,7 @@ public class ServiceRegistry {
             return;
         }
         File[] dirfiles = dir.listFiles(fileFilter);
+        assert dirfiles != null;
         for (File file : dirfiles) {
             if (file.isDirectory()) {
                 registerFromPackage(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter);
@@ -66,10 +71,10 @@ public class ServiceRegistry {
                     InService annotation = aClass.getAnnotation(InService.class);
                     if (annotation != null && Service.class.isAssignableFrom(aClass)) {
                         register(annotation.urlPattern(), aClass.asSubclass(Service.class).newInstance());
-                        System.out.println("成功注册服务: " + annotation.urlPattern() + "  " + className);
+                        LOGGER.info("成功注册服务,映射{}到{}", annotation.urlPattern(), className);
                     }
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    logger.log(Level.WARNING, e, () -> "注册服务出错");
+                    LOGGER.warn("注册服务出错", e);
                 }
             }
         }

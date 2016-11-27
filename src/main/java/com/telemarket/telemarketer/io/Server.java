@@ -1,13 +1,13 @@
 package com.telemarket.telemarketer.io;
 
 import com.telemarket.telemarketer.Connector;
+import com.telemarket.telemarketer.context.StartArgs;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.services.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -24,15 +24,12 @@ import java.util.concurrent.Executors;
  */
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
-    private InetAddress ip;
-    private int port;
+    private final StartArgs startArgs;
     private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private Selector selector;
 
-
-    public Server(InetAddress ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public Server(StartArgs startArgs) {
+        this.startArgs = startArgs;
     }
 
     public void start() {
@@ -72,8 +69,7 @@ public class Server {
                     } else if (key.isReadable()) {
                         SocketChannel client = (SocketChannel) key.channel();
                         executor.execute(new Connector(client, selector));
-                        key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);// 取消对读取事件的兴趣 本来写的是cancel 以为是取消对读的感兴趣，
-                        // 结果导致register 写事件的时候非常慢,等待了几秒。 不知道为什么
+                        key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
                     }
                 } catch (Exception e) {
                     LOGGER.error("socket channel 出错了", e);
@@ -92,9 +88,9 @@ public class Server {
         System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
         ServerSocketChannel serverChannel;
         try {
-            ServiceRegistry.registerServices();
+            ServiceRegistry.registerServices(startArgs);
             serverChannel = ServerSocketChannel.open();
-            serverChannel.bind(new InetSocketAddress(this.ip, this.port));
+            serverChannel.bind(new InetSocketAddress(startArgs.getIp(), startArgs.getPort()));
             serverChannel.configureBlocking(false);
             selector = Selector.open();
             serverChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -102,6 +98,6 @@ public class Server {
             LOGGER.error("初始化错误", e);
             System.exit(1);
         }
-        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", ip.getHostAddress(), port, System.currentTimeMillis() - start);
+        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", startArgs.getIp(), startArgs.getPort(), System.currentTimeMillis() - start);
     }
 }
