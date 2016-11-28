@@ -1,9 +1,9 @@
 package com.telemarket.telemarketer.io;
 
-import com.telemarket.telemarketer.Connector;
+import com.telemarket.telemarketer.context.Connector;
+import com.telemarket.telemarketer.context.ServiceRegistry;
 import com.telemarket.telemarketer.context.StartArgs;
 import com.telemarket.telemarketer.http.responses.Response;
-import com.telemarket.telemarketer.services.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +16,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Chen Yijie on 2016/11/27 17:14.
@@ -25,7 +23,6 @@ import java.util.concurrent.Executors;
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final StartArgs startArgs;
-    private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private Selector selector;
 
     public Server(StartArgs startArgs) {
@@ -68,7 +65,7 @@ public class Server {
                         }
                     } else if (key.isReadable()) {
                         SocketChannel client = (SocketChannel) key.channel();
-                        executor.execute(new Connector(client, selector));
+                        ThreadPool.execute(new Connector(client, selector));
                         key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
                     }
                 } catch (Exception e) {
@@ -88,7 +85,7 @@ public class Server {
         System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
         ServerSocketChannel serverChannel;
         try {
-            ServiceRegistry.registerServices(startArgs);
+            ServiceRegistry.registerServices();
             serverChannel = ServerSocketChannel.open();
             serverChannel.bind(new InetSocketAddress(startArgs.getIp(), startArgs.getPort()));
             serverChannel.configureBlocking(false);
@@ -98,6 +95,6 @@ public class Server {
             LOGGER.error("初始化错误", e);
             System.exit(1);
         }
-        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", startArgs.getIp(), startArgs.getPort(), System.currentTimeMillis() - start);
+        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", startArgs.getIp().getHostAddress(), startArgs.getPort(), System.currentTimeMillis() - start);
     }
 }

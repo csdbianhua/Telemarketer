@@ -1,4 +1,4 @@
-package com.telemarket.telemarketer;
+package com.telemarket.telemarketer.context;
 
 import com.telemarket.telemarketer.http.exceptions.IllegalRequestException;
 import com.telemarket.telemarketer.http.exceptions.ServerInternalException;
@@ -8,7 +8,6 @@ import com.telemarket.telemarketer.http.responses.NotFoundResponse;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.http.responses.ServerInternalResponse;
 import com.telemarket.telemarketer.services.Service;
-import com.telemarket.telemarketer.services.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,12 +1,12 @@
-package com.telemarket.telemarketer.services;
+package com.telemarket.telemarketer.context;
 
-import com.telemarket.telemarketer.context.StartArgs;
+import com.telemarket.telemarketer.services.InService;
+import com.telemarket.telemarketer.services.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,17 +41,11 @@ public class ServiceRegistry {
 
     /**
      * 注册服务
-     *
-     * @param startArgs
      */
-    public static void registerServices(StartArgs startArgs) {
-        Class rootClazz = startArgs.getRootClazz();
-        URL packageUrl = rootClazz.getResource("/");
-        if (packageUrl == null) {
-            return;
-        }
-        String name = rootClazz.getPackage().getName();
-        registerFromPackage(name, packageUrl.getFile() + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
+    public static void registerServices() {
+        String bashPath = Context.getBashPath();
+        String name = Context.getPackageName();
+        registerFromPackage(name, bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
     }
 
     private static void registerFromPackage(String packageName, String packagePath, FileFilter fileFilter) {
