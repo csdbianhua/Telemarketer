@@ -1,14 +1,13 @@
 package com.telemarket.telemarketer.services.impls;
 
-import com.telemarket.telemarketer.Server;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.requests.Request;
+import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.NotFoundResponse;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.services.InService;
 import com.telemarket.telemarketer.services.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
-import com.telemarket.telemarketer.http.responses.FileResponse;
 
 import java.io.File;
 
