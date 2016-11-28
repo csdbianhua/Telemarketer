@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 public class ServiceRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
-    private static Map<String, Service> services = Collections.synchronizedMap(new TreeMap<String, Service>()); //TODO 一直可写的话注意同步问题
+    private static Map<String, Service> services = Collections.synchronizedMap(new TreeMap<String, Service>());
 
     public static void register(String pattern, Service service) {
         services.put(pattern, service);

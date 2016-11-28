@@ -16,7 +16,7 @@ public class ThreadPool {
                 200,
                 60,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(200),
+                new LinkedBlockingQueue<>(1000),
                 new ThreadPoolExecutor.DiscardPolicy());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
