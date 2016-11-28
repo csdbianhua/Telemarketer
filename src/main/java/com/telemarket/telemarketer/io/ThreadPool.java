@@ -12,12 +12,12 @@ public class ThreadPool {
     private static ThreadPoolExecutor threadPoolExecutor;
 
     static {
-        threadPoolExecutor = new ThreadPoolExecutor(10,
+        threadPoolExecutor = new ThreadPoolExecutor(20,
                 200,
                 60,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                new LinkedBlockingQueue<>(200),
+                new ThreadPoolExecutor.DiscardPolicy());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
