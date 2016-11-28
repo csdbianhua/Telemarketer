@@ -33,10 +33,7 @@ public class BytesUtil {
             if (i <= max) {
                 int j = i + 1;
                 int end = j + targetCount - 1;
-                for (int k = 1; j < end && source[j]
-                        == str.charAt(k); j++, k++)
-                    ;
-
+                for (int k = 1; j < end && source[j] == str.charAt(k); j++, k++) ;
                 if (j == end) {
                     return i;
                 }

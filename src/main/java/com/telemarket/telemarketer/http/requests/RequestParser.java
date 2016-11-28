@@ -14,16 +14,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Chen Yijie on 2016/11/25 16:39.
  */
-public class RequestHandler {
-
-    private final static Logger LOGGER = Logger.getLogger("RequestHandler");
-
+public class RequestParser {
 
     public static Request parseRequest(SocketChannel channel) throws IllegalRequestException, IOException {
 
@@ -57,26 +52,19 @@ public class RequestHandler {
     private static RequestHeader parseHeader(byte[] head) throws IOException {
         try (BufferedReader reader = new BufferedReader(new StringReader(new String(head, "UTF-8")))) {
             Map<String, String> headMap = new HashMap<>();
-            String path;
-            String method;
-            try {
-                String line = reader.readLine();
-                String[] lineOne = line.split("\\s");
-                path = URLDecoder.decode(lineOne[1], "utf-8");
-                method = lineOne[0];
-                while ((line = reader.readLine()) != null) {
-                    String[] keyValue = line.split(":");
-                    headMap.put(keyValue[0].trim(), keyValue[1].trim());
-                }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e, () -> "请求解析有错误");
-                throw new RuntimeException(e);
+            String line = reader.readLine();
+            String[] lineOne = line.split("\\s");
+            String path = URLDecoder.decode(lineOne[1], "utf-8");
+            String method = lineOne[0];
+            while ((line = reader.readLine()) != null) {
+                String[] keyValue = line.split(":");
+                headMap.put(keyValue[0].trim(), keyValue[1].trim());
             }
             Map<String, String> queryMap = Collections.emptyMap();
             int index = path.indexOf('?');
             if (index != -1) {
                 queryMap = new HashMap<>();
-                RequestHandler.parseParameters(path.substring(index + 1), queryMap);
+                RequestParser.parseParameters(path.substring(index + 1), queryMap);
                 path = path.substring(0, index);
             }
             RequestHeader header = new RequestHeader();
@@ -101,12 +89,12 @@ public class RequestHandler {
             return new RequestBody();
         }
         String contentType = header.getContentType();
-        Map<String, MIMEData> mimeMap = Collections.emptyMap();
+        Map<String, MimeData> mimeMap = Collections.emptyMap();
         Map<String, String> formMap = new HashMap<>();
         if (contentType.contains("application/x-www-form-urlencoded")) {
             try {
                 String bodyMsg = new String(body, "utf-8");
-                RequestHandler.parseParameters(bodyMsg, formMap);
+                RequestParser.parseParameters(bodyMsg, formMap);
             } catch (UnsupportedEncodingException ignored) {
             }
         } else if (contentType.contains("multipart/form-data")) {
@@ -125,8 +113,8 @@ public class RequestHandler {
      * @param bouStr boundary 字符串
      * @return name和mime数据的map
      */
-    private static Map<String, MIMEData> parseFormData(byte[] body, String bouStr) {
-        Map<String, MIMEData> mimeData = new HashMap<>();
+    private static Map<String, MimeData> parseFormData(byte[] body, String bouStr) {
+        Map<String, MimeData> mimeData = new HashMap<>();
         int bouLength = bouStr.length();
 
         int lastIndex = BytesUtil.lastIndexOf(body, bouStr);
@@ -172,7 +160,7 @@ public class RequestHandler {
                 curIndex = lineEndIndex + 2;
             }
             data = Arrays.copyOfRange(curBody, curIndex, curBody.length);
-            mimeData.put(name, new MIMEData(mimeType, data, fileName));
+            mimeData.put(name, new MimeData(mimeType, data, fileName));
         } while (endIndex != lastIndex);
         return mimeData;
     }

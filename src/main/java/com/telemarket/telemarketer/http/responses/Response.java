@@ -1,14 +1,12 @@
 package com.telemarket.telemarketer.http.responses;
 
-import com.telemarket.telemarketer.util.PropertiesHelper;
 import com.telemarket.telemarketer.http.Status;
+import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Http响应
@@ -16,7 +14,6 @@ import java.util.logging.Logger;
 public class Response {
 
     private static final String HTTP_VERSION = "HTTP/1.1";
-    private static Logger logger = Logger.getLogger("Response");
     public static final String CHARSET = "utf-8";
     private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
 
@@ -61,12 +58,10 @@ public class Response {
                 sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
             }
             sb.append("\r\n");
-            byte[] head;
+            byte[] head = new byte[0];
             try {
                 head = sb.toString().getBytes(CHARSET);
-            } catch (UnsupportedEncodingException ignore) {
-                logger.log(Level.SEVERE, "amazing,不支持编码" + CHARSET);
-                throw new IllegalStateException("amazing,不支持编码" + CHARSET);
+            } catch (UnsupportedEncodingException ignored) {
             }
             finalData = ByteBuffer.allocate(head.length + content.length + 2);
             finalData.put(head);

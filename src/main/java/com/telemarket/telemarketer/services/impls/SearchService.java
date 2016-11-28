@@ -6,7 +6,7 @@ import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.services.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
-import com.telemarket.telemarketer.http.requests.MIMEData;
+import com.telemarket.telemarketer.http.requests.MimeData;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.services.InService;
 
@@ -25,7 +25,7 @@ public class SearchService implements Service {
     @Override
     public Response service(Request request) {
         if (request.mimeContainKey("photo")) {
-            MIMEData photo = request.mimeValue("photo");
+            MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
             try {
                 BufferedImage read = ImageIO.read(new ByteInputStream(data, data.length));

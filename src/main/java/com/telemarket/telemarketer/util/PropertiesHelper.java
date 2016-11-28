@@ -1,19 +1,20 @@
 package com.telemarket.telemarketer.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 负责获取配置
  */
 public class PropertiesHelper {
 
-    private static Logger logger = Logger.getLogger("PropertiesHelper");
+    private static Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
     private static Properties properties;
     private static String resourcePath;
 
@@ -23,12 +24,12 @@ public class PropertiesHelper {
         try (FileInputStream fileStream = new FileInputStream(setting)) {
             properties.load(fileStream);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "配置文件无法读取 : " + setting);
-            throw new IllegalStateException("配置文件无法读取" + setting);
+            logger.error("配置文件无法读取 : " + setting);
+            System.exit(1);
         }
         URL resource = PropertiesHelper.class.getClassLoader().getResource("");
         if (resource == null) {
-            logger.log(Level.SEVERE, "resource路径读取失败 ");
+            logger.error("resource路径读取失败 ");
             System.exit(1);
         }
         resourcePath = resource.getFile();

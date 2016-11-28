@@ -1,12 +1,5 @@
 package com.telemarket.telemarketer.http.requests;
 
-import com.telemarket.telemarketer.util.BytesUtil;
-import com.telemarket.telemarketer.http.exceptions.IllegalRequestException;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -49,7 +42,7 @@ public class Request {
         return body.getFormMap();
     }
 
-    public Map<String, MIMEData> getMimeMap() {
+    public Map<String, MimeData> getMimeMap() {
         return body.getMimeMap();
     }
 
@@ -57,7 +50,7 @@ public class Request {
         return body.formValue(key);
     }
 
-    public MIMEData mimeValue(String key) {
+    public MimeData mimeValue(String key) {
         return body.mimeValue(key);
     }
 
