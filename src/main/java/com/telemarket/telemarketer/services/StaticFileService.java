@@ -28,7 +28,7 @@ public class StaticFileService {
 
     @Path(StaticFileService.prefix + ".*")
     public Response service(Request request) {
-        String filePath = staticPath + File.separator + request.getURI().replaceAll(prefix, "");
+        String filePath = staticPath + File.separator + request.getRequestURI().replaceAll(prefix, "");
         File file = new File(root, filePath);
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             return new NotFoundResponse();
