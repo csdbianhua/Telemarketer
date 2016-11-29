@@ -36,7 +36,7 @@ public class ServiceRegistry {
     }
 
     /**
-     * 根据路径查找对应服务 TODO 提升搜寻服务速度,使用Tree一类的
+     * 根据路径查找对应服务 TODO 提升搜寻服务速度,使用Trie一类的
      *
      * @param request 请求
      * @return 对应服务
