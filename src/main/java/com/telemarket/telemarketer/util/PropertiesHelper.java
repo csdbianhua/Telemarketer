@@ -18,6 +18,9 @@ public class PropertiesHelper {
     private static Properties properties;
     private static String resourcePath;
 
+    private PropertiesHelper() {
+    }
+
     static {
         properties = new Properties();
         String setting = ClassLoader.getSystemResource("setting.properties").getPath();

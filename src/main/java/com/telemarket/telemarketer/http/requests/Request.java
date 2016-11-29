@@ -1,6 +1,6 @@
 package com.telemarket.telemarketer.http.requests;
 
-import com.telemarket.telemarketer.http.exceptions.NotSupportMethodException;
+import com.telemarket.telemarketer.exceptions.NotSupportMethodException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -77,10 +77,6 @@ public class Request implements HttpServletRequest {
 
     public MimeData mimeValue(String key) {
         return body.mimeValue(key);
-    }
-
-    public String getURI() {
-        return header.getURI();
     }
 
 
@@ -261,11 +257,12 @@ public class Request implements HttpServletRequest {
         if (StringUtils.isNotEmpty(characterEncoding)) {
             return characterEncoding;
         }
-        String[] split = header.getContentType().split(";");
-        if (split.length <= 1) {
-            return null; // TODO 获取MIME中的charset
+        String contentType = header.getContentType();
+        int i = StringUtils.indexOf(contentType, "charset=");
+        if (i < 0) {
+            return null;
         }
-        characterEncoding = split[split.length - 1].split("=")[1];
+        characterEncoding = StringUtils.substring(contentType, i + 8, contentType.length()).trim();
         return characterEncoding;
     }
 

@@ -1,4 +1,4 @@
-package com.telemarket.telemarketer.http.exceptions;
+package com.telemarket.telemarketer.exceptions;
 
 /**
  * Chen Yijie on 2016/11/28 17:35.

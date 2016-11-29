@@ -1,5 +1,7 @@
 package com.telemarket.telemarketer.mvc.annotation;
 
+import com.telemarket.telemarketer.http.HttpMethod;
+
 import java.lang.annotation.*;
 
 /**
@@ -10,4 +12,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface Path {
     String value() default "/";
+
+    HttpMethod[] method() default {};
 }

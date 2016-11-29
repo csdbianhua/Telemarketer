@@ -1,7 +1,7 @@
 package com.telemarket.telemarketer.http.responses;
 
+import com.telemarket.telemarketer.exceptions.NotSupportMethodException;
 import com.telemarket.telemarketer.http.Status;
-import com.telemarket.telemarketer.http.exceptions.NotSupportMethodException;
 import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import javax.servlet.ServletOutputStream;

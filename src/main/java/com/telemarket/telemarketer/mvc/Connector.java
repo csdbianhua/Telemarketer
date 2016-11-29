@@ -1,5 +1,6 @@
 package com.telemarket.telemarketer.mvc;
 
+import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.exceptions.IllegalRequestException;
 import com.telemarket.telemarketer.http.exceptions.ServerInternalException;
 import com.telemarket.telemarketer.http.requests.Request;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -42,13 +42,13 @@ public class Connector implements Runnable {
             if (request == null) {
                 return;
             }
-            ServiceMethodInfo service = ServiceRegistry.findService(request.getURI());
+            ServiceMethodInfo service = ServiceRegistry.findService(request);
             if (service == null) {
                 response = new NotFoundResponse();
+            } else if (!service.containHttpMethod(request.getMethod())) {
+                response = new Response(Status.METHOD_NOT_ALLOWED_405);
             } else {
-                Object object = service.getObject();
-                Method method = service.getMethod();
-                response = (Response) method.invoke(object, request);
+                response = (Response) service.invoke(request);
                 if (response == null) {
                     throw new ServerInternalException("service返回了一个null");
                 }
@@ -65,8 +65,9 @@ public class Connector implements Runnable {
             response = new ServerInternalResponse();
         }
         attachResponse(response);
-        assert request != null;
-        LOGGER.info("{} \"{}\" {} {}ms", request.getMethod(), request.getURI(), response.getStatus(), System.currentTimeMillis() - start);
+        if (request != null) {
+            LOGGER.info("{} \"{}\" {} {}ms", request.getMethod(), request.getRequestURI(), response.getStatus(), System.currentTimeMillis() - start);
+        }
     }
 
     private void attachResponse(Response response) {

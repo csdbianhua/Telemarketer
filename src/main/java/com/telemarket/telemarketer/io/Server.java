@@ -28,7 +28,9 @@ public class Server {
     }
 
     public void start() {
-        init();
+        if (!init()) {
+            return;
+        }
         while (true) {
             try {
                 if (selector.select() == 0) {
@@ -71,17 +73,18 @@ public class Server {
                     key.cancel();
                     try {
                         key.channel().close();
-                    } catch (IOException ignored) {
+                    } catch (IOException e2) {
+                        LOGGER.error("socket channel 关闭出错", e2);
                     }
                 }
             }
         }
     }
 
-    private void init() {
+    private boolean init() {
         long start = System.currentTimeMillis();
         System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
-        ServerSocketChannel serverChannel;
+        ServerSocketChannel serverChannel = null;
         try {
             ServiceRegistry.registerServices();
             serverChannel = ServerSocketChannel.open();
@@ -91,8 +94,16 @@ public class Server {
             serverChannel.register(selector, SelectionKey.OP_ACCEPT);
         } catch (IOException e) {
             LOGGER.error("初始化错误", e);
-            System.exit(1);
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException e1) {
+                    LOGGER.error("serverChannel关闭错误", e1);
+                }
+            }
+            return false;
         }
         LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", Context.getIp().getHostAddress(), Context.getPort(), System.currentTimeMillis() - start);
+        return true;
     }
 }
