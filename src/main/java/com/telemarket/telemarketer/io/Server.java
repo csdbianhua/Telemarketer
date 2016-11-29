@@ -1,9 +1,14 @@
 package com.telemarket.telemarketer.io;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.mvc.Connector;
 import com.telemarket.telemarketer.mvc.ServiceRegistry;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,9 +88,9 @@ public class Server {
 
     private boolean init() {
         long start = System.currentTimeMillis();
-        System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
         ServerSocketChannel serverChannel = null;
         try {
+            loadLogConfiguration();
             ServiceRegistry.registerServices();
             serverChannel = ServerSocketChannel.open();
             serverChannel.bind(new InetSocketAddress(Context.getIp(), Context.getPort()));
@@ -105,5 +110,22 @@ public class Server {
         }
         LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", Context.getIp().getHostAddress(), Context.getPort(), System.currentTimeMillis() - start);
         return true;
+    }
+
+    private void loadLogConfiguration() {
+        String logConfigurationPath = System.getProperty("logback.configurationFile");
+        if (StringUtils.isBlank(logConfigurationPath)) {
+            logConfigurationPath = "conf/logback-tele.xml";
+        }
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(lc);
+        lc.reset();
+        try {
+            configurator.doConfigure(ClassLoader.getSystemResource(logConfigurationPath));
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+        } catch (JoranException e) {
+            LOGGER.error("重新配置logback出错");
+        }
     }
 }
