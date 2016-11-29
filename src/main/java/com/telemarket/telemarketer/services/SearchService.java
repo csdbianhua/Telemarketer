@@ -1,5 +1,6 @@
 package com.telemarket.telemarketer.services;
 
+import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.requests.MimeData;
 import com.telemarket.telemarketer.http.requests.Request;
@@ -24,7 +25,7 @@ import java.io.IOException;
 @Service
 public class SearchService {
 
-    @Path("/search")
+    @Path(value = "/search", method = HttpMethod.POST)
     public Response service(Request request) {
         if (request.mimeContainKey("photo")) {
             MimeData photo = request.mimeValue("photo");

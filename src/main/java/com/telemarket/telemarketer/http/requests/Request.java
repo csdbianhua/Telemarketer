@@ -257,11 +257,12 @@ public class Request implements HttpServletRequest {
         if (StringUtils.isNotEmpty(characterEncoding)) {
             return characterEncoding;
         }
-        String[] split = header.getContentType().split(";");
-        if (split.length <= 1) {
-            return null; // TODO 获取MIME中的charset
+        String contentType = header.getContentType();
+        int i = StringUtils.indexOf(contentType, "charset=");
+        if (i < 0) {
+            return null;
         }
-        characterEncoding = split[split.length - 1].split("=")[1];
+        characterEncoding = StringUtils.substring(contentType, i + 8, contentType.length()).trim();
         return characterEncoding;
     }
 
