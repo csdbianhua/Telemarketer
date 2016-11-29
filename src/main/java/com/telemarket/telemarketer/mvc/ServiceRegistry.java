@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
  */
 public class ServiceRegistry {
 
+    private static final char separatorChar = '/';
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
     private static Map<String, ServiceMethodInfo> services = Collections.synchronizedMap(new TreeMap<String, ServiceMethodInfo>());
 
@@ -116,33 +117,33 @@ public class ServiceRegistry {
         int childStart = 0;
         int parentEnd = pn;
 
-        if ((cn > 1) && (c.charAt(0) == File.pathSeparatorChar)) {
-            if (c.charAt(1) == File.pathSeparatorChar) {
+        if ((cn > 1) && (c.charAt(0) == separatorChar)) {
+            if (c.charAt(1) == separatorChar) {
                 childStart = 2;
             } else {
                 childStart = 1;
 
             }
             if (cn == childStart) {
-                if (parent.charAt(pn - 1) == File.pathSeparatorChar)
+                if (parent.charAt(pn - 1) == separatorChar)
                     return parent.substring(0, pn - 1);
                 return parent;
             }
         }
 
-        if (parent.charAt(pn - 1) == File.pathSeparatorChar)
+        if (parent.charAt(pn - 1) == separatorChar)
             parentEnd--;
 
         int strlen = parentEnd + cn - childStart;
         char[] theChars = null;
-        if (child.charAt(childStart) == File.pathSeparatorChar) {
+        if (child.charAt(childStart) == separatorChar) {
             theChars = new char[strlen];
             parent.getChars(0, parentEnd, theChars, 0);
             child.getChars(childStart, cn, theChars, parentEnd);
         } else {
             theChars = new char[strlen + 1];
             parent.getChars(0, parentEnd, theChars, 0);
-            theChars[parentEnd] = File.pathSeparatorChar;
+            theChars[parentEnd] = separatorChar;
             child.getChars(childStart, cn, theChars, parentEnd + 1);
         }
         return new String(theChars);
