@@ -6,6 +6,9 @@ package com.telemarket.telemarketer.util;
  */
 public class BytesUtil {
 
+    private BytesUtil() {
+    }
+
     public static int indexOf(byte[] source, String str) {
         return indexOf(source, str, 0);
     }
