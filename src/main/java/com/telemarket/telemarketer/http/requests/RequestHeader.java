@@ -1,6 +1,10 @@
 package com.telemarket.telemarketer.http.requests;
 
-import java.util.Collections;
+import com.telemarket.telemarketer.http.HttpScheme;
+import org.apache.commons.collections4.MultiValuedMap;
+
+import javax.servlet.http.Cookie;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -12,15 +16,19 @@ class RequestHeader {
     private String URI;
     private String method;
     private Map<String, String> head;
-    private Map<String, String> queryMap;
+    private MultiValuedMap<String, String> queryMap;
+    private String queryString;
+    private Cookie[] cookies;
+    private HttpScheme scheme;
 
-    RequestHeader() {
-        URI = "";
-        method = "";
-        head = Collections.emptyMap();
-        queryMap = Collections.emptyMap();
+
+    public Cookie[] getCookies() {
+        return cookies;
     }
 
+    public void setCookies(Cookie[] cookies) {
+        this.cookies = cookies;
+    }
 
     public void setURI(String URI) {
         this.URI = URI;
@@ -38,9 +46,7 @@ class RequestHeader {
         this.head = head;
     }
 
-    public void setQueryMap(Map<String, String> queryMap) {
-        this.queryMap = queryMap;
-    }
+
 
     public String getURI() {
         return URI;
@@ -54,11 +60,11 @@ class RequestHeader {
         return queryMap.containsKey(key);
     }
 
-    public Map<String, String> getQueryMap() {
-        return Collections.unmodifiableMap(queryMap);
+    public MultiValuedMap<String, String> getQueryMap() {
+        return queryMap;
     }
 
-    public String queryValue(String key) {
+    public Collection<String> queryValue(String key) {
         return queryMap.get(key);
     }
 
@@ -68,5 +74,26 @@ class RequestHeader {
 
     public int getContentLength() {
         return Integer.valueOf(head.getOrDefault("Content-Length", "0"));
+    }
+
+
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
+    }
+
+    public String getQueryString() {
+        return queryString;
+    }
+
+    public void setQueryMap(MultiValuedMap<String, String> queryMap) {
+        this.queryMap = queryMap;
+    }
+
+    public void setScheme(HttpScheme scheme) {
+        this.scheme = scheme;
+    }
+
+    public HttpScheme getScheme() {
+        return scheme;
     }
 }

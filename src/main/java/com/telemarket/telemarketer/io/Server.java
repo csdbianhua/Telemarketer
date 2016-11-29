@@ -1,9 +1,9 @@
 package com.telemarket.telemarketer.io;
 
-import com.telemarket.telemarketer.context.Connector;
-import com.telemarket.telemarketer.context.ServiceRegistry;
-import com.telemarket.telemarketer.context.StartArgs;
+import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.http.responses.Response;
+import com.telemarket.telemarketer.mvc.Connector;
+import com.telemarket.telemarketer.mvc.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +22,9 @@ import java.util.Set;
  */
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
-    private final StartArgs startArgs;
     private Selector selector;
 
-    public Server(StartArgs startArgs) {
-        this.startArgs = startArgs;
+    public Server() {
     }
 
     public void start() {
@@ -87,7 +85,7 @@ public class Server {
         try {
             ServiceRegistry.registerServices();
             serverChannel = ServerSocketChannel.open();
-            serverChannel.bind(new InetSocketAddress(startArgs.getIp(), startArgs.getPort()));
+            serverChannel.bind(new InetSocketAddress(Context.getIp(), Context.getPort()));
             serverChannel.configureBlocking(false);
             selector = Selector.open();
             serverChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -95,6 +93,6 @@ public class Server {
             LOGGER.error("初始化错误", e);
             System.exit(1);
         }
-        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", startArgs.getIp().getHostAddress(), startArgs.getPort(), System.currentTimeMillis() - start);
+        LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", Context.getIp().getHostAddress(), Context.getPort(), System.currentTimeMillis() - start);
     }
 }

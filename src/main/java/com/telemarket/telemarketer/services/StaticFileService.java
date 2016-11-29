@@ -1,12 +1,12 @@
-package com.telemarket.telemarketer.services.impls;
+package com.telemarket.telemarketer.services;
 
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.NotFoundResponse;
 import com.telemarket.telemarketer.http.responses.Response;
-import com.telemarket.telemarketer.services.InService;
-import com.telemarket.telemarketer.services.Service;
+import com.telemarket.telemarketer.mvc.annotation.Path;
+import com.telemarket.telemarketer.mvc.annotation.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import java.io.File;
@@ -14,8 +14,8 @@ import java.io.File;
 /**
  * 静态文件服务
  */
-@InService(urlPattern = "^" + StaticFileService.prefix + ".*$")
-public class StaticFileService implements Service {
+@Service
+public class StaticFileService {
 
     static final String prefix = "/s/";
     private static String staticPath;
@@ -26,7 +26,7 @@ public class StaticFileService implements Service {
         root = StaticFileService.class.getClassLoader().getResource("").getPath();
     }
 
-    @Override
+    @Path(StaticFileService.prefix + ".*")
     public Response service(Request request) {
         String filePath = staticPath + File.separator + request.getURI().replaceAll(prefix, "");
         File file = new File(root, filePath);

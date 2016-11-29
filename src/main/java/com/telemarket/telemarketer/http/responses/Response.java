@@ -1,8 +1,14 @@
 package com.telemarket.telemarketer.http.responses;
 
 import com.telemarket.telemarketer.http.Status;
+import com.telemarket.telemarketer.http.exceptions.NotSupportMethodException;
 import com.telemarket.telemarketer.util.PropertiesHelper;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -11,7 +17,7 @@ import java.util.*;
 /**
  * Http响应
  */
-public class Response {
+public class Response implements HttpServletResponse {
 
     private static final String HTTP_VERSION = "HTTP/1.1";
     public static final String CHARSET = "utf-8";
@@ -43,8 +49,108 @@ public class Response {
     }
 
 
-    public Status getStatus() {
-        return status;
+    @Override
+    public void addCookie(Cookie cookie) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public boolean containsHeader(String name) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public String encodeURL(String url) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public String encodeRedirectURL(String url) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public String encodeUrl(String url) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public String encodeRedirectUrl(String url) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void sendError(int sc, String msg) throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void sendError(int sc) throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void sendRedirect(String location) throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setDateHeader(String name, long date) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void addDateHeader(String name, long date) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setHeader(String name, String value) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void addHeader(String name, String value) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setIntHeader(String name, int value) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void addIntHeader(String name, int value) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setStatus(int sc) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setStatus(int sc, String sm) {
+        throw new NotSupportMethodException();
+    }
+
+    public int getStatus() {
+        return status.getCode();
+    }
+
+    @Override
+    public String getHeader(String name) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public Collection<String> getHeaders(String name) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        throw new NotSupportMethodException();
     }
 
     private ByteBuffer finalData = null;
@@ -71,5 +177,85 @@ public class Response {
             finalData.flip();
         }
         return finalData;
+    }
+
+    @Override
+    public String getCharacterEncoding() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public String getContentType() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setCharacterEncoding(String charset) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setContentLength(int len) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setContentLengthLong(long len) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setContentType(String type) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setBufferSize(int size) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public int getBufferSize() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void flushBuffer() throws IOException {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void resetBuffer() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public boolean isCommitted() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void reset() {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public void setLocale(Locale loc) {
+        throw new NotSupportMethodException();
+    }
+
+    @Override
+    public Locale getLocale() {
+        throw new NotSupportMethodException();
     }
 }

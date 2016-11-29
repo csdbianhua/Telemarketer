@@ -1,5 +1,8 @@
 package com.telemarket.telemarketer.http.requests;
 
+import org.apache.commons.collections4.MultiValuedMap;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
@@ -8,16 +11,11 @@ import java.util.Map;
  * Created by hason on 15/9/29.
  */
 class RequestBody {
-    private Map<String, String> formMap;
+    private MultiValuedMap<String, String> formMap;
     private Map<String, MimeData> mimeMap;
 
 
-    RequestBody() {
-        this.formMap = Collections.emptyMap();
-        this.mimeMap = Collections.emptyMap();
-    }
-
-    public void setFormMap(Map<String, String> formMap) {
+    public void setFormMap(MultiValuedMap<String, String> formMap) {
         this.formMap = formMap;
     }
 
@@ -33,15 +31,15 @@ class RequestBody {
         return mimeMap.containsKey(key);
     }
 
-    public Map<String, String> getFormMap() {
-        return Collections.unmodifiableMap(formMap);
+    public MultiValuedMap<String, String> getFormMap() {
+        return formMap;
     }
 
     public Map<String, MimeData> getMimeMap() {
         return Collections.unmodifiableMap(mimeMap);
     }
 
-    public String formValue(String key) {
+    public Collection<String> formValue(String key) {
         return formMap.get(key);
     }
 

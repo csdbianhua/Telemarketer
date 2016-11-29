@@ -1,8 +1,16 @@
 package com.telemarket.telemarketer.http.requests;
 
+import com.telemarket.telemarketer.http.HttpScheme;
 import com.telemarket.telemarketer.http.exceptions.IllegalRequestException;
 import com.telemarket.telemarketer.util.BytesUtil;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.Cookie;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -19,6 +27,8 @@ import java.util.Map;
  * Chen Yijie on 2016/11/25 16:39.
  */
 public class RequestParser {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestParser.class);
 
     public static Request parseRequest(SocketChannel channel) throws IllegalRequestException, IOException {
 
@@ -50,33 +60,38 @@ public class RequestParser {
     }
 
     private static RequestHeader parseHeader(byte[] head) throws IOException {
+        RequestHeader header = new RequestHeader();
         try (BufferedReader reader = new BufferedReader(new StringReader(new String(head, "UTF-8")))) {
             Map<String, String> headMap = new HashMap<>();
             String line = reader.readLine();
             String[] lineOne = line.split("\\s");
             String path = URLDecoder.decode(lineOne[1], "utf-8");
             String method = lineOne[0];
+            HttpScheme scheme = HttpScheme.parseScheme(lineOne[2]);
             while ((line = reader.readLine()) != null) {
                 String[] keyValue = line.split(":");
                 headMap.put(keyValue[0].trim(), keyValue[1].trim());
             }
-            Map<String, String> queryMap = Collections.emptyMap();
             int index = path.indexOf('?');
+            MultiValuedMap<String, String> queryMap = new ArrayListValuedHashMap<>();
+            String queryString = StringUtils.EMPTY;
             if (index != -1) {
-                queryMap = new HashMap<>();
-                RequestParser.parseParameters(path.substring(index + 1), queryMap);
+                queryString = path.substring(index + 1);
+                RequestParser.parseParameters(queryString, queryMap);
                 path = path.substring(0, index);
             }
-            RequestHeader header = new RequestHeader();
             header.setURI(path);
             header.setMethod(method);
-            header.setQueryMap(queryMap);
             header.setHead(headMap);
+            header.setQueryString(queryString);
+            header.setQueryMap(queryMap);
+            header.setCookies(parseCookie(headMap));
+            header.setScheme(scheme);
             return header;
         }
     }
 
-    public static void parseParameters(String s, Map<String, String> requestParameters) {
+    public static void parseParameters(String s, MultiValuedMap<String, String> requestParameters) {
         String[] paras = s.split("&");
         for (String para : paras) {
             String[] split = para.split("=");
@@ -90,7 +105,7 @@ public class RequestParser {
         }
         String contentType = header.getContentType();
         Map<String, MimeData> mimeMap = Collections.emptyMap();
-        Map<String, String> formMap = new HashMap<>();
+        MultiValuedMap<String, String> formMap = new ArrayListValuedHashMap<>();
         if (contentType.contains("application/x-www-form-urlencoded")) {
             try {
                 String bodyMsg = new String(body, "utf-8");
@@ -163,5 +178,28 @@ public class RequestParser {
             mimeData.put(name, new MimeData(mimeType, data, fileName));
         } while (endIndex != lastIndex);
         return mimeData;
+    }
+
+    private static Cookie[] parseCookie(Map<String, String> headMap) {
+        if (MapUtils.isEmpty(headMap)) {
+            return new Cookie[0];
+        }
+        String cookies = headMap.get("Cookie");
+        if (StringUtils.isBlank(cookies)) {
+            return new Cookie[0];
+        }
+        String[] split = cookies.split(";");
+        Cookie[] cookieArray = new Cookie[split.length];
+        for (int i = 0; i < split.length; i++) {
+            String[] array;
+            try {
+                array = split[i].split("=", 2);
+                cookieArray[i] = new Cookie(array[0], array[1]);
+            } catch (RuntimeException e) {
+                LOGGER.error("解析cookie出现问题", e);
+                cookieArray[i] = new Cookie(StringUtils.EMPTY, StringUtils.EMPTY);
+            }
+        }
+        return cookieArray;
     }
 }
