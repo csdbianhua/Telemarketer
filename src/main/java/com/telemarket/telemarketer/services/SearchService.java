@@ -1,6 +1,5 @@
 package com.telemarket.telemarketer.services;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.requests.MimeData;
 import com.telemarket.telemarketer.http.requests.Request;
@@ -14,6 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -30,7 +30,7 @@ public class SearchService {
             MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
             try {
-                BufferedImage read = ImageIO.read(new ByteInputStream(data, data.length));
+                BufferedImage read = ImageIO.read(new ByteArrayInputStream(data));
                 if (read == null) {
                     return new Response(Status.BAD_REQUEST_400);
                 }
