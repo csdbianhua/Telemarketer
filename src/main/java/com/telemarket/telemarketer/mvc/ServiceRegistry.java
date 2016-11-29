@@ -1,6 +1,8 @@
 package com.telemarket.telemarketer.mvc;
 
 import com.telemarket.telemarketer.context.Context;
+import com.telemarket.telemarketer.http.HttpMethod;
+import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 import org.apache.commons.lang3.StringUtils;
@@ -33,14 +35,15 @@ public class ServiceRegistry {
     }
 
     /**
-     * 根据路径查找对应服务
+     * 根据路径查找对应服务 TODO 提升搜寻服务速度,使用Tree一类的
      *
-     * @param path 请求路径
+     * @param request 请求
      * @return 对应服务
      */
-    public static ServiceMethodInfo findService(String path) {
+    public static ServiceMethodInfo findService(Request request) {
+        String requestURI = request.getRequestURI();
         for (Map.Entry<String, ServiceMethodInfo> entry : services.entrySet()) {
-            if (path.matches(entry.getKey())) {
+            if (requestURI.matches(entry.getKey())) {
                 return entry.getValue();
             }
         }
@@ -85,13 +88,14 @@ public class ServiceRegistry {
                                 continue;
                             }
                             String methodPath = methodAnnotation.value();
-                            ServiceMethodInfo info = new ServiceMethodInfo(controller, method);
+                            HttpMethod[] httpMethod = methodAnnotation.method();
+                            ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
                             String path = combinePath(classPath, methodPath);
                             if (containPattern(path)) {
                                 LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
                             }
                             register(path, info);
-                            LOGGER.info("成功注册服务,映射{}到{}.{}", path, className, method.getName());
+                            LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, className, method.getName());
                         }
                     }
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {

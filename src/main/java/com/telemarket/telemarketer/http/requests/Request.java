@@ -1,6 +1,6 @@
 package com.telemarket.telemarketer.http.requests;
 
-import com.telemarket.telemarketer.http.exceptions.NotSupportMethodException;
+import com.telemarket.telemarketer.exceptions.NotSupportMethodException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -77,10 +77,6 @@ public class Request implements HttpServletRequest {
 
     public MimeData mimeValue(String key) {
         return body.mimeValue(key);
-    }
-
-    public String getURI() {
-        return header.getURI();
     }
 
 

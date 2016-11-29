@@ -1,113 +1,113 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>基于本体的图像检索系统</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Telemarketer Homepage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            height: 100vh;
-        }
+    body {
+      height: 100vh;
+    }
 
-        .container {
-            width: 100%;
-            padding-top: 100px;
-        }
+    .container {
+      width: 100%;
+      padding-top: 100px;
+    }
 
-        .logo {
-            text-align: center;
-        }
+    .logo {
+      text-align: center;
+    }
 
-        .search {
-            margin: 30px auto;
-            width: 650px;
-            height: 33px;
-        }
+    .search {
+      margin: 30px auto;
+      width: 650px;
+      height: 33px;
+    }
 
-        .sear {
-            width: 550px;
-            height: 33px;
-            border: 1px solid lightblue;
-            float: left;
-        }
+    .sear {
+      width: 550px;
+      height: 33px;
+      border: 1px solid lightblue;
+      float: left;
+    }
 
-        .sear:hover {
-            border: 1px solid blue;
-        }
+    .sear:hover {
+      border: 1px solid blue;
+    }
 
-        .change {
-            border: 1px solid blue;
-        }
+    .change {
+      border: 1px solid blue;
+    }
 
-        .btn {
-            float: left;
-            margin-left: 15px;
-        }
+    .btn {
+      float: left;
+      margin-left: 15px;
+    }
 
-        .btn button {
+    .btn button {
 
-            height: 35px;
-            width: 80px;
-        }
+      height: 35px;
+      width: 80px;
+    }
 
-        .photo {
-            float: right;
-            padding: 3px;
-        }
+    .photo {
+      float: right;
+      padding: 3px;
+    }
 
-        .board {
-            float: left;
+    .board {
+      float: left;
 
-        }
+    }
 
-        .board input {
-            width: 480px;
-            height: 25px;
-            border: none;
-            outline: none;
-            margin-top: 3px;
-            margin-left: 15px;
-            font-size: 18px;
-        }
+    .board input {
+      width: 480px;
+      height: 25px;
+      border: none;
+      outline: none;
+      margin-top: 3px;
+      margin-left: 15px;
+      font-size: 18px;
+    }
 
-    </style>
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="logo">
-        <img src="/s/images/google.png" height="92" width="272" alt=""/>
-    </div>
+  <div class="logo">
+    <img src="/s/images/google.png" height="92" width="272" alt=""/>
+  </div>
 
 
-    <div class="search">
+  <div class="search">
 
-        <form id="form" action="/search" method="post">
-            <div id="sear" class="sear">
+    <form id="form" action="/search" method="post">
+      <div id="sear" class="sear">
 
 
-                <div id="word_board" class="board">
-                    <input name="word" id="word_input" type="text"/>
-                </div>
+        <div id="word_board" class="board">
+          <input name="word" id="word_input" type="text"/>
+        </div>
 
-                <div id="photo_sear_button" class="photo">
-                    <img src="/s/images/photo.jpg" height="25" width="30" alt=""/>
-                </div>
+        <div id="photo_sear_button" class="photo">
+          <img src="/s/images/photo.jpg" height="25" width="30" alt=""/>
+        </div>
 
-            </div>
+      </div>
 
-            <div class="btn">
-                <button id="subm" type="submit">
-                    <img src="/s/images/search.png" height="23" width="23" alt=""/>
-                </button>
-            </div>
-        </form>
-    </div>
+      <div class="btn">
+        <button id="subm" type="submit">
+          <img src="/s/images/search.png" height="23" width="23" alt=""/>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 
@@ -117,68 +117,68 @@
 <script type="application/javascript">
 
 
-    var word_board = $("#word_board");
-    var submit_button = $("#subm");
-    var search_div = $("#sear");
-    var word_input = $("#word_input");
+  var word_board = $("#word_board");
+  var submit_button = $("#subm");
+  var search_div = $("#sear");
+  var word_input = $("#word_input");
 
-    var flag = false;
+  var flag = false;
 
-    var fileInput = '<input id="photo_board" type="file" name="photo" style="display:none;" onchange="showName();">';
+  var fileInput = '<input id="photo_board" type="file" name="photo" style="display:none;" onchange="showName();">';
 
-    var types = "jpg|jpeg|png|gif|bmp";
-    var pattern = /.*(jpg|jpeg|png|gif|bmp|JPG|JPEG|PNG|GIF|BMP)/;
+  var types = "jpg|jpeg|png|gif|bmp";
+  var pattern = /.*(jpg|jpeg|png|gif|bmp|JPG|JPEG|PNG|GIF|BMP)/;
 
-    $("#photo_sear_button").click(function () {
-        search_div.parent().append(fileInput);
-        var photo_board = $("#photo_board");
-        photo_board.click();
-    });
+  $("#photo_sear_button").click(function () {
+    search_div.parent().append(fileInput);
+    var photo_board = $("#photo_board");
+    photo_board.click();
+  });
 
-    function showName() {
-        var photo_board = $("#photo_board");
-        var filepath = photo_board.val();
-        if (!pattern.test(filepath)) {
-            alert("请上传图片 " + types);
-            return;
-        }
-        word_input.val(filepath);
+  function showName() {
+    var photo_board = $("#photo_board");
+    var filepath = photo_board.val();
+    if (!pattern.test(filepath)) {
+      alert("请上传图片 " + types);
+      return;
     }
+    word_input.val(filepath);
+  }
 
-    $(document).ready(function () {
-        $("#form").bind("submit", function () {
-            var photo_board = $("#photo_board");
-            var filepath = photo_board.val();
-            var word_text = word_input.val();
-            if (filepath == word_text) {
-                word_board.remove();
-                search_div.parent().attr("enctype", "multipart/form-data");
-                return true;
-            } else {
-                photo_board.remove();
-                return false;
-            }
+  $(document).ready(function () {
+    $("#form").bind("submit", function () {
+      var photo_board = $("#photo_board");
+      var filepath = photo_board.val();
+      var word_text = word_input.val();
+      if (filepath == word_text) {
+        word_board.remove();
+        search_div.parent().attr("enctype", "multipart/form-data");
+        return true;
+      } else {
+        photo_board.remove();
+        return false;
+      }
 
-        })
-    });
+    })
+  });
 
 
-    var s = document.getElementById('sear');
-    document.body.onclick = function () {
-        if (s.className.indexOf('change') > -1) {
-            s.className = s.className.replace(' change', '')
-        }
-    };
-    s.onclick = function (event) {
-        if (s.className.indexOf('change') < 0) {
-            s.className += ' change';
-        }
-        stopPro(event);
-    };
-    function stopPro(evt) {
-        var e = evt || window.event;
-        window.event ? e.cancelBubble = true : e.stopPropagation();
+  var s = document.getElementById('sear');
+  document.body.onclick = function () {
+    if (s.className.indexOf('change') > -1) {
+      s.className = s.className.replace(' change', '')
     }
+  };
+  s.onclick = function (event) {
+    if (s.className.indexOf('change') < 0) {
+      s.className += ' change';
+    }
+    stopPro(event);
+  };
+  function stopPro(evt) {
+    var e = evt || window.event;
+    window.event ? e.cancelBubble = true : e.stopPropagation();
+  }
 
 
 </script>
