@@ -5,6 +5,7 @@ import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +78,10 @@ public class ServiceRegistry {
                     if (annotation != null) {
                         Path classAnnotation = aClass.getAnnotation(Path.class);
                         String classPath = StringUtils.EMPTY;
+                        HttpMethod[] classHttpMethod = null;
                         if (classAnnotation != null) {
                             classPath = classAnnotation.value();
+                            classHttpMethod = classAnnotation.method();
                         }
                         Method[] methods = aClass.getMethods();
                         Object controller = aClass.newInstance();
@@ -89,6 +92,13 @@ public class ServiceRegistry {
                             }
                             String methodPath = methodAnnotation.value();
                             HttpMethod[] httpMethod = methodAnnotation.method();
+                            if (ArrayUtils.isEmpty(httpMethod)) {
+                                if (ArrayUtils.isEmpty(classHttpMethod)) {
+                                    httpMethod = new HttpMethod[]{HttpMethod.GET};
+                                } else {
+                                    httpMethod = classHttpMethod;
+                                }
+                            }
                             ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
                             String path = combinePath(classPath, methodPath);
                             if (containPattern(path)) {

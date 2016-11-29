@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 public @interface Path {
     String value() default "/";
 
-    HttpMethod[] method() default {HttpMethod.GET};
+    HttpMethod[] method() default {};
 }
