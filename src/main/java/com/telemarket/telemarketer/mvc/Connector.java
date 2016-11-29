@@ -1,4 +1,4 @@
-package com.telemarket.telemarketer.context;
+package com.telemarket.telemarketer.mvc;
 
 import com.telemarket.telemarketer.http.exceptions.IllegalRequestException;
 import com.telemarket.telemarketer.http.exceptions.ServerInternalException;
@@ -7,11 +7,11 @@ import com.telemarket.telemarketer.http.requests.RequestParser;
 import com.telemarket.telemarketer.http.responses.NotFoundResponse;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.http.responses.ServerInternalResponse;
-import com.telemarket.telemarketer.services.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -42,11 +42,13 @@ public class Connector implements Runnable {
             if (request == null) {
                 return;
             }
-            Service service = ServiceRegistry.findService(request.getURI());
+            ServiceMethodInfo service = ServiceRegistry.findService(request.getURI());
             if (service == null) {
                 response = new NotFoundResponse();
             } else {
-                response = service.service(request);
+                Object object = service.getObject();
+                Method method = service.getMethod();
+                response = (Response) method.invoke(object, request);
                 if (response == null) {
                     throw new ServerInternalException("service返回了一个null");
                 }
@@ -58,13 +60,13 @@ public class Connector implements Runnable {
         } catch (IllegalRequestException e) {
             LOGGER.error("请求有错误", e);
             response = new ServerInternalResponse();
+        } catch (Exception e) {
+            LOGGER.error("未知服务器内部错误", e);
+            response = new ServerInternalResponse();
         }
         attachResponse(response);
-
         assert request != null;
-        LOGGER.info("{} \"{}\" {} {}ms", request.getMethod(), request.getURI(), response.getStatus().getCode(), System.currentTimeMillis() - start);
-
-
+        LOGGER.info("{} \"{}\" {} {}ms", request.getMethod(), request.getURI(), response.getStatus(), System.currentTimeMillis() - start);
     }
 
     private void attachResponse(Response response) {

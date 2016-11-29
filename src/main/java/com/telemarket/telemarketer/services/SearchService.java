@@ -1,14 +1,14 @@
-package com.telemarket.telemarketer.services.impls;
+package com.telemarket.telemarketer.services;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.telemarket.telemarketer.http.Status;
-import com.telemarket.telemarketer.http.requests.Request;
-import com.telemarket.telemarketer.http.responses.Response;
-import com.telemarket.telemarketer.services.Service;
-import com.telemarket.telemarketer.util.PropertiesHelper;
 import com.telemarket.telemarketer.http.requests.MimeData;
+import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
-import com.telemarket.telemarketer.services.InService;
+import com.telemarket.telemarketer.http.responses.Response;
+import com.telemarket.telemarketer.mvc.annotation.Path;
+import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,9 +20,11 @@ import java.io.IOException;
  * Be careful!
  * Created by hason on 15/9/30.
  */
-@InService(urlPattern = "^/search$")
-public class SearchService implements Service {
-    @Override
+
+@Service
+public class SearchService {
+
+    @Path("/search")
     public Response service(Request request) {
         if (request.mimeContainKey("photo")) {
             MimeData photo = request.mimeValue("photo");
