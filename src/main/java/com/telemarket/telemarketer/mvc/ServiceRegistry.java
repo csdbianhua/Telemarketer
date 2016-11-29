@@ -23,12 +23,27 @@ import java.util.regex.Matcher;
  */
 public class ServiceRegistry {
 
-    private static final char separatorChar = '/';
+    private static final char SEPARATOR_CHAR = '/';
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
     private static Map<String, ServiceMethodInfo> services = Collections.synchronizedMap(new TreeMap<String, ServiceMethodInfo>());
 
-    public static void register(String pattern, ServiceMethodInfo service) {
-        services.put(pattern, service);
+    /**
+     * 动态注册服务
+     *
+     * @param path    路径
+     * @param service 服务
+     */
+    public static void register(String path, ServiceMethodInfo service) {
+        services.put(path, service);
+    }
+
+    /**
+     * 动态注销服务
+     *
+     * @param path 路径
+     */
+    public static void unregister(String path) {
+        services.remove(path);
     }
 
     public static boolean containPattern(String pattern) {
@@ -36,7 +51,7 @@ public class ServiceRegistry {
     }
 
     /**
-     * 根据路径查找对应服务 TODO 提升搜寻服务速度,使用Trie一类的，同时需要实现最长匹配原则
+     * 根据路径查找对应服务 TODO 提升搜寻服务速度,使用Trie一类的，同时需要实现最长匹配原则 另外应取消正则，用*匹配
      *
      * @param request 请求
      * @return 对应服务
@@ -52,7 +67,7 @@ public class ServiceRegistry {
     }
 
     /**
-     * 注册服务
+     * 注册服务 TODO 可以使用多线程
      */
     public static void registerServices() {
         String bashPath = Context.getBashPath();
@@ -131,33 +146,33 @@ public class ServiceRegistry {
         int childStart = 0;
         int parentEnd = pn;
 
-        if ((cn > 1) && (c.charAt(0) == separatorChar)) {
-            if (c.charAt(1) == separatorChar) {
+        if ((cn > 1) && (c.charAt(0) == SEPARATOR_CHAR)) {
+            if (c.charAt(1) == SEPARATOR_CHAR) {
                 childStart = 2;
             } else {
                 childStart = 1;
 
             }
             if (cn == childStart) {
-                if (parent.charAt(pn - 1) == separatorChar)
+                if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
                     return parent.substring(0, pn - 1);
                 return parent;
             }
         }
 
-        if (parent.charAt(pn - 1) == separatorChar)
+        if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
             parentEnd--;
 
         int strlen = parentEnd + cn - childStart;
         char[] theChars = null;
-        if (child.charAt(childStart) == separatorChar) {
+        if (child.charAt(childStart) == SEPARATOR_CHAR) {
             theChars = new char[strlen];
             parent.getChars(0, parentEnd, theChars, 0);
             child.getChars(childStart, cn, theChars, parentEnd);
         } else {
             theChars = new char[strlen + 1];
             parent.getChars(0, parentEnd, theChars, 0);
-            theChars[parentEnd] = separatorChar;
+            theChars[parentEnd] = SEPARATOR_CHAR;
             child.getChars(childStart, cn, theChars, parentEnd + 1);
         }
         return new String(theChars);
