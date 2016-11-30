@@ -1,12 +1,22 @@
 package com.telemarket.telemarketer.context;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 /**
  * Chen Yijie on 2016/11/27 21:08.
  */
 public class Context {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Context.class);
     public static final int DEFAULT_PORT = 8877;
     private static String bashPath;
     private static String packageName;
@@ -66,6 +76,7 @@ public class Context {
             errorMsg = "请输入正确的ip";
             return;
         }
+        loadLogConfiguration();
         String homePath = rootClazz.getResource("/").getPath();
         String packageName = rootClazz.getPackage().getName();
         Context.setBashPath(homePath);
@@ -80,5 +91,28 @@ public class Context {
 
     public static void printError() {
         System.err.println(errorMsg);
+    }
+
+    private static void loadLogConfiguration() {
+        String logConfigurationPath = System.getProperty("logback.configurationFile");
+        if (StringUtils.isBlank(logConfigurationPath)) {
+            logConfigurationPath = "conf/logback-tele.xml";
+        }
+        URL configPath = ClassLoader.getSystemResource(logConfigurationPath);
+        if (configPath == null) {
+            System.err.println("无可用日志配置，将使用缺省配置");
+            return;
+        }
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(lc);
+        lc.reset();
+        try {
+            configurator.doConfigure(configPath);
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+        } catch (JoranException e) {
+            System.err.println("配置日志配置出错");
+            e.printStackTrace(System.err);
+        }
     }
 }
