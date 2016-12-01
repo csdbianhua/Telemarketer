@@ -15,9 +15,9 @@ public class JsonResponse extends Response {
         if (obj == null) {
             throw new ServerInternalException("Json响应对象为空");
         }
-        heads.put("Content-Type", "application/json; charset=" + CHARSET);
+        heads.put("Content-Type", "application/json; charset=" + DEFAULT_CHARSET);
         try {
-            super.content = new Gson().toJson(obj).getBytes(CHARSET);
+            super.content = new Gson().toJson(obj).getBytes(DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException ignored) {
         }
 

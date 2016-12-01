@@ -23,10 +23,9 @@ import java.util.Map;
  */
 public class Response implements HttpServletResponse {
 
-    private static final String HTTP_VERSION = "HTTP/1.1";
-    public static final String CHARSET = "utf-8";
-
-
+    protected static final String HTTP_VERSION = "HTTP/1.1";
+    protected static final String DEFAULT_CHARSET = "utf-8";
+    protected Locale locale; // TODO 时区设置
     protected Status status;
     protected Map<String, String> heads;
     protected byte[] content;
@@ -37,7 +36,7 @@ public class Response implements HttpServletResponse {
         content = new byte[0];
         heads.put("Date", TimeUtils.toRFC822(ZonedDateTime.now()));
         heads.put("Server", PropertiesHelper.getProperty("server_name", "Telemarketer"));
-        heads.put("Connection", "Close");
+        heads.put("Connection", "Close"); // TODO keep-alive
     }
 
     public void setHead(String key, String value) {
@@ -169,7 +168,7 @@ public class Response implements HttpServletResponse {
             sb.append("\r\n");
             byte[] head = new byte[0];
             try {
-                head = sb.toString().getBytes(CHARSET);
+                head = sb.toString().getBytes(DEFAULT_CHARSET);
             } catch (UnsupportedEncodingException ignored) {
             }
             finalData = ByteBuffer.allocate(head.length + content.length + 2);
@@ -254,11 +253,11 @@ public class Response implements HttpServletResponse {
 
     @Override
     public void setLocale(Locale loc) {
-        throw new NotSupportMethodException();
+        locale = loc;
     }
 
     @Override
     public Locale getLocale() {
-        throw new NotSupportMethodException();
+        return locale == null ? Locale.getDefault() : locale;
     }
 }

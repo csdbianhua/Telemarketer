@@ -34,7 +34,7 @@ public class FileResponse extends Response {
             String contentType = MimeTypes.findContentType(path);
             content = Files.readAllBytes(FileSystems.getDefault().getPath(path)); // TODO 静态文件不应该全部读到内存中下载 同时需要支持gzip以及chunk
             if (contentType.startsWith("text")) {
-                contentType += "; charset=" + CHARSET;
+                contentType += "; charset=" + DEFAULT_CHARSET;
             }
             heads.put("Content-Type", contentType);
         } catch (IOException e) {

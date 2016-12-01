@@ -38,7 +38,7 @@ public class StaticFileService {
         String ifModifiedSinceStr = request.getHeader("if-modified-since");
         if (StringUtils.isNotEmpty(ifModifiedSinceStr)) {
             long isModifiedSince = TimeUtils.parseRFC822(ifModifiedSinceStr).toInstant().toEpochMilli();
-            if (file.lastModified() <= isModifiedSince) {
+            if (file.lastModified() / 1000 <= isModifiedSince / 1000) {
                 return new Response(Status.NOT_MODIFIED_304);
             }
         }
