@@ -3,7 +3,7 @@ package com.telemarket.telemarketer.http.exceptions;
 /**
  * 业务异常
  * <p>
- * Chen Yijie on 2016/11/25 16:37.
+ * Hanson on 2016/11/25 16:37.
  */
 public class BaseRuntimeException extends RuntimeException {
 

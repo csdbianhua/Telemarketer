@@ -208,6 +208,7 @@ public class Request implements HttpServletRequest {
     }
 
     @Override
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         throw new NotSupportMethodException();
     }
@@ -386,6 +387,7 @@ public class Request implements HttpServletRequest {
     }
 
     @Override
+    @Deprecated
     public String getRealPath(String s) {
         throw new NotSupportMethodException();
     }

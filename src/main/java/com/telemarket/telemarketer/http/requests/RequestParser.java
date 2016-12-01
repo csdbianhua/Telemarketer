@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Chen Yijie on 2016/11/25 16:39.
+ * Hanson on 2016/11/25 16:39.
  */
 public class RequestParser {
 
@@ -69,8 +69,8 @@ public class RequestParser {
             String method = lineOne[0];
             HttpScheme scheme = HttpScheme.parseScheme(lineOne[2]);
             while ((line = reader.readLine()) != null) {
-                String[] keyValue = line.split(":");
-                headMap.put(keyValue[0].trim(), keyValue[1].trim());
+                String[] keyValue = line.split(":", 2);
+                headMap.put(keyValue[0].trim().toLowerCase(), keyValue[1].trim());
             }
             int index = path.indexOf('?');
             MultiValuedMap<String, String> queryMap = new ArrayListValuedHashMap<>();
@@ -80,8 +80,8 @@ public class RequestParser {
                 RequestParser.parseParameters(queryString, queryMap);
                 path = path.substring(0, index);
             }
-            header.setURI(path);
-            header.setMethod(method);
+            header.setURI(path); // 大小写敏感
+            header.setMethod(method); // 大小写敏感
             header.setHead(headMap);
             header.setQueryString(queryString);
             header.setQueryMap(queryMap);

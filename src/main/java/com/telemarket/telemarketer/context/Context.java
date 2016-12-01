@@ -4,10 +4,15 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.telemarket.telemarketer.util.PropertiesHelper;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -76,13 +81,19 @@ public class Context {
             errorMsg = "请输入正确的ip";
             return;
         }
-        loadLogConfiguration();
         String homePath = rootClazz.getResource("/").getPath();
         String packageName = rootClazz.getPackage().getName();
         Context.setBashPath(homePath);
         Context.setPackageName(packageName);
         Context.setIp(ip);
         Context.setPort(port);
+
+        if (!loadLogConfiguration()) {
+            return;
+        }
+        if (!loadViewConfiguration()) {
+            return;
+        }
     }
 
     public static boolean isError() {
@@ -93,7 +104,7 @@ public class Context {
         System.err.println(errorMsg);
     }
 
-    private static void loadLogConfiguration() {
+    private static boolean loadLogConfiguration() { // TODO 抽离加载配置的方法 使系统统一扫描加载
         String logConfigurationPath = System.getProperty("logback.configurationFile");
         if (StringUtils.isBlank(logConfigurationPath)) {
             logConfigurationPath = "conf/logback-tele.xml";
@@ -101,7 +112,7 @@ public class Context {
         URL configPath = ClassLoader.getSystemResource(logConfigurationPath);
         if (configPath == null) {
             System.err.println("无可用日志配置，将使用缺省配置");
-            return;
+            return true;
         }
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
@@ -112,7 +123,22 @@ public class Context {
             StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
         } catch (JoranException e) {
             System.err.println("配置日志配置出错");
-            e.printStackTrace(System.err);
+            return false;
         }
+        return true;
+    }
+
+    private static boolean loadViewConfiguration() {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
+        try {
+            cfg.setDirectoryForTemplateLoading(new File(PropertiesHelper.getResourcePath("template")));
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            return false;
+        }
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        cfg.setLogTemplateExceptions(true);
+        return true;
     }
 }
