@@ -3,6 +3,7 @@ package com.telemarket.telemarketer.http.responses;
 import com.telemarket.telemarketer.exceptions.NotSupportMethodException;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.util.PropertiesHelper;
+import com.telemarket.telemarketer.util.TimeUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -11,22 +12,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Http响应
  */
 public class Response implements HttpServletResponse {
 
-    private static final String HTTP_VERSION = "HTTP/1.1";
-    public static final String CHARSET = "utf-8";
-    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
-
-    static {
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
+    protected static final String HTTP_VERSION = "HTTP/1.1";
+    protected static final String DEFAULT_CHARSET = "utf-8";
+    protected Locale locale; // TODO 时区设置
     protected Status status;
     protected Map<String, String> heads;
     protected byte[] content;
@@ -35,9 +34,9 @@ public class Response implements HttpServletResponse {
         this.status = status;
         heads = new HashMap<>();
         content = new byte[0];
-        heads.put("Date", simpleDateFormat.format(new Date()));
+        heads.put("Date", TimeUtils.toRFC822(ZonedDateTime.now()));
         heads.put("Server", PropertiesHelper.getProperty("server_name", "Telemarketer"));
-        heads.put("Connection", "Close");
+        heads.put("Connection", "Close"); // TODO keep-alive
     }
 
     public void setHead(String key, String value) {
@@ -70,11 +69,13 @@ public class Response implements HttpServletResponse {
     }
 
     @Override
+    @Deprecated
     public String encodeUrl(String url) {
         throw new NotSupportMethodException();
     }
 
     @Override
+    @Deprecated
     public String encodeRedirectUrl(String url) {
         throw new NotSupportMethodException();
     }
@@ -130,6 +131,7 @@ public class Response implements HttpServletResponse {
     }
 
     @Override
+    @Deprecated
     public void setStatus(int sc, String sm) {
         throw new NotSupportMethodException();
     }
@@ -166,7 +168,7 @@ public class Response implements HttpServletResponse {
             sb.append("\r\n");
             byte[] head = new byte[0];
             try {
-                head = sb.toString().getBytes(CHARSET);
+                head = sb.toString().getBytes(DEFAULT_CHARSET);
             } catch (UnsupportedEncodingException ignored) {
             }
             finalData = ByteBuffer.allocate(head.length + content.length + 2);
@@ -251,11 +253,11 @@ public class Response implements HttpServletResponse {
 
     @Override
     public void setLocale(Locale loc) {
-        throw new NotSupportMethodException();
+        locale = loc;
     }
 
     @Override
     public Locale getLocale() {
-        throw new NotSupportMethodException();
+        return locale == null ? Locale.getDefault() : locale;
     }
 }

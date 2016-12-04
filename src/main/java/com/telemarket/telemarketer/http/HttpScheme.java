@@ -3,7 +3,7 @@ package com.telemarket.telemarketer.http;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Chen Yijie on 2016/11/29 11:12.
+ * Hanson on 2016/11/29 11:12.
  */
 public enum HttpScheme {
 

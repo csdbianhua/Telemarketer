@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Chen Yijie on 2016/11/27 17:14.
+ * Hanson on 2016/11/27 17:14.
  */
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
@@ -83,7 +83,6 @@ public class Server {
 
     private boolean init() {
         long start = System.currentTimeMillis();
-        System.setProperty("logback.configurationFile", "conf/logback-tele.xml");
         ServerSocketChannel serverChannel = null;
         try {
             ServiceRegistry.registerServices();
@@ -106,4 +105,6 @@ public class Server {
         LOGGER.info("服务器启动 http://{}:{}/ ,耗时{}ms", Context.getIp().getHostAddress(), Context.getPort(), System.currentTimeMillis() - start);
         return true;
     }
+
+
 }

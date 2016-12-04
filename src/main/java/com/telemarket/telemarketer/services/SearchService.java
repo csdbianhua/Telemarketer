@@ -25,6 +25,11 @@ import java.io.IOException;
 @Service
 public class SearchService {
 
+    @Path("/test")
+    public Response test(Request request) {
+        return new FileResponse(Status.SUCCESS_200, PropertiesHelper.getTemplateFile("search.html"));
+    }
+
     @Path(value = "/search", method = HttpMethod.POST)
     public Response service(Request request) {
         if (request.mimeContainKey("photo")) {

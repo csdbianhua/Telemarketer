@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Chen Yijie on 2016/11/29 22:50.
+ * Hanson on 2016/11/29 22:50.
  */
 public class MimeTypes {
     private final static Map<String, String> mimeMap = new HashMap<>();
