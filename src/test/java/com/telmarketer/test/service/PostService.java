@@ -1,4 +1,4 @@
-package com.telemarket.telemarketer.services;
+package com.telmarketer.test.service;
 
 import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.Status;
@@ -8,32 +8,27 @@ import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
-import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Be careful!
- * Created by hason on 15/9/30.
+ * Be careful.
+ * Author: Hanson
+ * Email: imyijie@outlook.com
+ * Date: 2016/12/4
  */
-
 @Service
-public class SearchService {
+public class PostService {
 
-    @Path("/test")
-    public Response test(Request request) {
-        return new FileResponse(Status.SUCCESS_200, PropertiesHelper.getTemplateFile("search.html"));
-    }
-
-    @Path(value = "/search", method = HttpMethod.POST)
-    public Response service(Request request) {
-        if (request.mimeContainKey("photo")) {
-            MimeData photo = request.mimeValue("photo");
+    @Path(value = "/test_post", method = HttpMethod.POST)
+    public Response testPost(Request request) {
+        if (request.mimeContainKey("img")) {
+            MimeData photo = request.mimeValue("img");
             byte[] data = photo.getData();
             try {
-                File file = File.createTempFile("test", ".jpeg");
+                File file = File.createTempFile("the", ".jpeg");
                 FileOutputStream os = new FileOutputStream(file);
                 os.write(data);
                 os.close();

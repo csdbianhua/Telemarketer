@@ -15,8 +15,10 @@ import com.telemarket.telemarketer.mvc.annotation.Service;
 @Service
 public class TestService {
 
-    @Path("/hello_world")
+    @Path("hello_world")
     public Response helloWorld(Request request) {
         return new Response(Status.SUCCESS_200);
     }
+
+
 }

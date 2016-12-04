@@ -44,7 +44,13 @@ public class ServiceRegistry {
      * @param path 路径
      */
     public static void unregister(String path) {
-        services.remove(path);
+        ServiceMethodInfo remove = services.remove(path);
+        if (remove != null) {
+            LOGGER.info("取消注册服务,path:{},method:{}.{}",
+                    path,
+                    remove.getObject().getClass().getName(),
+                    remove.getMethod().getName());
+        }
     }
 
     public static boolean containPattern(String pattern) {
@@ -73,7 +79,7 @@ public class ServiceRegistry {
      * @param className 服务类名
      * @return 注册成功返回true
      */
-    public static boolean register(String className) {
+    public static boolean registerClass(String className) {
         if (StringUtils.isBlank(className)) {
             return false;
         }
@@ -167,7 +173,7 @@ public class ServiceRegistry {
                     ThreadPool.execute(new RegistryThread(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter));
                 } else {
                     String className = file.getName().substring(0, file.getName().length() - 6);
-                    register(packageName + "." + className);
+                    registerClass(packageName + "." + className);
                 }
             }
         }
