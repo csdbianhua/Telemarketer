@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Path {
-    String value() default "/";
+    String[] value() default {"/"};
 
     HttpMethod[] method() default {};
 }

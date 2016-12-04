@@ -83,7 +83,7 @@ public class ServiceRegistry {
             boolean flag = false;
             if (annotation != null) {
                 Path classAnnotation = clazz.getAnnotation(Path.class);
-                String classPath = "/";
+                String[] classPath = new String[]{"/"};
                 HttpMethod[] classHttpMethod = null;
                 if (classAnnotation != null) {
                     classPath = classAnnotation.value();
@@ -96,7 +96,7 @@ public class ServiceRegistry {
                     if (methodAnnotation == null) {
                         continue;
                     }
-                    String methodPath = methodAnnotation.value();
+                    String[] methodPath = methodAnnotation.value();
                     HttpMethod[] httpMethod = methodAnnotation.method();
                     if (ArrayUtils.isEmpty(httpMethod)) {
                         if (ArrayUtils.isEmpty(classHttpMethod)) {
@@ -106,13 +106,17 @@ public class ServiceRegistry {
                         }
                     }
                     ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
-                    String path = FileUtil.combinePath(classPath, methodPath);
-                    if (containPattern(path)) {
-                        LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
+                    for (String cP : classPath) {
+                        for (String s : methodPath) {
+                            String path = FileUtil.combinePath(cP, s);
+                            if (containPattern(path)) {
+                                LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
+                            }
+                            register(path, info);
+                            flag = true;
+                            LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, clazz.getName(), method.getName());
+                        }
                     }
-                    register(path, info);
-                    flag = true;
-                    LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, clazz.getName(), method.getName());
                 }
             }
             return flag;
