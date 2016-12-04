@@ -55,7 +55,7 @@ public class Server {
                     } else if (key.isWritable()) {
                         SocketChannel client = (SocketChannel) key.channel();
                         Response response = (Response) key.attachment();
-                        ByteBuffer byteBuffer = response.getByteBuffer();
+                        ByteBuffer byteBuffer = response.getByteBuffer(); // TODO 考虑修改为获取流
                         if (byteBuffer.hasRemaining()) {
                             client.write(byteBuffer);
                         }

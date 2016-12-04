@@ -31,7 +31,6 @@ public class RequestParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestParser.class);
 
     public static Request parseRequest(SocketChannel channel) throws IllegalRequestException, IOException {
-
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         channel.read(buffer); //IOException
         buffer.flip();
@@ -184,7 +183,7 @@ public class RequestParser {
         if (MapUtils.isEmpty(headMap)) {
             return new Cookie[0];
         }
-        String cookies = headMap.get("Cookie");
+        String cookies = headMap.get("cookie");
         if (StringUtils.isBlank(cookies)) {
             return new Cookie[0];
         }

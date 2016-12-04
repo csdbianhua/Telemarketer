@@ -157,6 +157,8 @@ public class Response implements HttpServletResponse {
 
     private ByteBuffer finalData = null;
 
+
+    // TODO 解耦HTTP生成
     public ByteBuffer getByteBuffer() {
         if (finalData == null) {
             heads.put("Content-Length", String.valueOf(content.length));
