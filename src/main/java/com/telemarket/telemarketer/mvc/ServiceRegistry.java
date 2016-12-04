@@ -75,6 +75,64 @@ public class ServiceRegistry {
         registerFromPackage(name, bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
     }
 
+    /**
+     * 动态注册服务
+     *
+     * @param className 服务类名
+     * @return 注册成功返回true
+     */
+    public static boolean register(String className) {
+        if (StringUtils.isBlank(className)) {
+            return false;
+        }
+        try {
+            Class<?> clazz = Class.forName(className);
+            Service annotation = clazz.getAnnotation(Service.class);
+            boolean flag = false;
+            if (annotation != null) {
+                Path classAnnotation = clazz.getAnnotation(Path.class);
+                String classPath = "/";
+                HttpMethod[] classHttpMethod = null;
+                if (classAnnotation != null) {
+                    classPath = classAnnotation.value();
+                    classHttpMethod = classAnnotation.method();
+                }
+                Method[] methods = clazz.getMethods();
+                Object controller = clazz.newInstance();
+                for (Method method : methods) {
+                    Path methodAnnotation = method.getAnnotation(Path.class);
+                    if (methodAnnotation == null) {
+                        continue;
+                    }
+                    String methodPath = methodAnnotation.value();
+                    HttpMethod[] httpMethod = methodAnnotation.method();
+                    if (ArrayUtils.isEmpty(httpMethod)) {
+                        if (ArrayUtils.isEmpty(classHttpMethod)) {
+                            httpMethod = new HttpMethod[]{HttpMethod.GET};
+                        } else {
+                            httpMethod = classHttpMethod;
+                        }
+                    }
+                    ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
+                    String path = combinePath(classPath, methodPath);
+                    if (containPattern(path)) {
+                        LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
+                    }
+                    register(path, info);
+                    flag = true;
+                    LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, clazz.getName(), method.getName());
+                }
+            }
+            return flag;
+        } catch (InstantiationException | IllegalAccessException e) {
+            LOGGER.error("无法访问服务构造器,{}", className, e);
+            return false;
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("无法找到服务类,{}", className, e);
+            return false;
+        }
+    }
+
     private static void registerFromPackage(String packageName, String packagePath, FileFilter fileFilter) {
         File dir = new File(packagePath);
         if (!dir.exists() || !dir.isDirectory()) {
@@ -87,45 +145,7 @@ public class ServiceRegistry {
                 registerFromPackage(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter);
             } else {
                 String className = file.getName().substring(0, file.getName().length() - 6);
-                try {
-                    Class<?> aClass = Class.forName(packageName + "." + className);
-                    Service annotation = aClass.getAnnotation(Service.class);
-                    if (annotation != null) {
-                        Path classAnnotation = aClass.getAnnotation(Path.class);
-                        String classPath = StringUtils.EMPTY;
-                        HttpMethod[] classHttpMethod = null;
-                        if (classAnnotation != null) {
-                            classPath = classAnnotation.value();
-                            classHttpMethod = classAnnotation.method();
-                        }
-                        Method[] methods = aClass.getMethods();
-                        Object controller = aClass.newInstance();
-                        for (Method method : methods) {
-                            Path methodAnnotation = method.getAnnotation(Path.class);
-                            if (methodAnnotation == null) {
-                                continue;
-                            }
-                            String methodPath = methodAnnotation.value();
-                            HttpMethod[] httpMethod = methodAnnotation.method();
-                            if (ArrayUtils.isEmpty(httpMethod)) {
-                                if (ArrayUtils.isEmpty(classHttpMethod)) {
-                                    httpMethod = new HttpMethod[]{HttpMethod.GET};
-                                } else {
-                                    httpMethod = classHttpMethod;
-                                }
-                            }
-                            ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
-                            String path = combinePath(classPath, methodPath);
-                            if (containPattern(path)) {
-                                LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
-                            }
-                            register(path, info);
-                            LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, className, method.getName());
-                        }
-                    }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    LOGGER.warn("注册服务出错", e);
-                }
+                register(packageName + "." + className);
             }
         }
     }

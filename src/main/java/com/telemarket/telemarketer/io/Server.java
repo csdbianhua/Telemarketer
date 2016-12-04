@@ -32,6 +32,9 @@ public class Server {
             return;
         }
         while (true) {
+            if (!selector.isOpen()) {
+                break;
+            }
             try {
                 if (selector.select() == 0) {
                     continue;
@@ -106,5 +109,12 @@ public class Server {
         return true;
     }
 
+    public void destory() {
+        try {
+            selector.close();
+        } catch (IOException e) {
+            LOGGER.error("关闭selector失败", e);
+        }
+    }
 
 }
