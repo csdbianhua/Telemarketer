@@ -11,7 +11,7 @@ public enum HttpHeader {
     COOKIE("Cookie"),
     SET_COOKIE("Set-Cookie"),
     MIME_VERSION("MIME-Version"),
-    IDENTITY("identity"),
+    IDENTITY("Identity"),
     SET_COOKIE2("Set-Cookie2"),
 
     // 共有
@@ -88,5 +88,9 @@ public enum HttpHeader {
 
     public String getName() {
         return name;
+    }
+
+    public String toLowerCaseName() {
+        return name.toLowerCase();
     }
 }

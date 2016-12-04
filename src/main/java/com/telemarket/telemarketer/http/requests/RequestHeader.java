@@ -1,5 +1,6 @@
 package com.telemarket.telemarketer.http.requests;
 
+import com.telemarket.telemarketer.http.HttpHeader;
 import com.telemarket.telemarketer.http.HttpScheme;
 import org.apache.commons.collections4.MultiValuedMap;
 
@@ -47,7 +48,6 @@ class RequestHeader {
     }
 
 
-
     public String getURI() {
         return URI;
     }
@@ -69,11 +69,11 @@ class RequestHeader {
     }
 
     public String getContentType() {
-        return head.get("Content-Type");
+        return head.get(HttpHeader.CONTENT_TYPE.toLowerCaseName());
     }
 
     public int getContentLength() {
-        return Integer.valueOf(head.getOrDefault("Content-Length", "0"));
+        return Integer.valueOf(head.getOrDefault(HttpHeader.CONTENT_LENGTH.toLowerCaseName(), "0"));
     }
 
 

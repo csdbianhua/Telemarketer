@@ -13,7 +13,7 @@ public class FileUtil {
     public static final char SEPARATOR_CHAR = '/';
 
     /**
-     * 复制于FileSystem的resolve
+     * 合并父子路径(处理路径分隔符)
      *
      * @param parent 父路径
      * @param child  子路径
