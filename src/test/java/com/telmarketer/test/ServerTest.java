@@ -48,6 +48,7 @@ public class ServerTest {
             String line = br.readLine();
             Assert.assertThat(line, CoreMatchers.containsString("200"));
         }
+        ServiceRegistry.unregister("/hello_world");
     }
 
     @After

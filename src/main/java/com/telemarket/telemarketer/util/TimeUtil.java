@@ -10,7 +10,7 @@ import java.util.Locale;
  * Email: imyijie@outlook.com
  * Date: 2016/12/1
  */
-public class TimeUtils {
+public class TimeUtil {
     private static final DateTimeFormatter RFC822 = DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 
     public static ZonedDateTime parseRFC822(String timeStr) {

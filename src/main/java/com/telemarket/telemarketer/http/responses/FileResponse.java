@@ -3,7 +3,7 @@ package com.telemarket.telemarketer.http.responses;
 import com.telemarket.telemarketer.http.MimeTypes;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.exceptions.ServerInternalException;
-import com.telemarket.telemarketer.util.TimeUtils;
+import com.telemarket.telemarketer.util.TimeUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class FileResponse extends Response {
             return;
         }
         long l = file.lastModified();
-        heads.put("Last-Modified", TimeUtils.toRFC822(ZonedDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault())));
+        heads.put("Last-Modified", TimeUtil.toRFC822(ZonedDateTime.ofInstant(Instant.ofEpochMilli(l), ZoneId.systemDefault())));
         String path = file.getAbsolutePath();
         try {
             String contentType = MimeTypes.findContentType(path);

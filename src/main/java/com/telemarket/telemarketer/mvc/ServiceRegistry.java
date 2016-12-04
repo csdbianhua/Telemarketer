@@ -3,8 +3,10 @@ package com.telemarket.telemarketer.mvc;
 import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.requests.Request;
+import com.telemarket.telemarketer.io.ThreadPool;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.util.FileUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +25,6 @@ import java.util.regex.Matcher;
  */
 public class ServiceRegistry {
 
-    private static final char SEPARATOR_CHAR = '/';
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
     private static Map<String, ServiceMethodInfo> services = Collections.synchronizedMap(new TreeMap<String, ServiceMethodInfo>());
 
@@ -67,15 +68,6 @@ public class ServiceRegistry {
     }
 
     /**
-     * 注册服务 TODO 可以使用多线程
-     */
-    public static void registerServices() {
-        String bashPath = Context.getBashPath();
-        String name = Context.getPackageName();
-        registerFromPackage(name, bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
-    }
-
-    /**
      * 动态注册服务
      *
      * @param className 服务类名
@@ -114,7 +106,7 @@ public class ServiceRegistry {
                         }
                     }
                     ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
-                    String path = combinePath(classPath, methodPath);
+                    String path = FileUtil.combinePath(classPath, methodPath);
                     if (containPattern(path)) {
                         LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
                     }
@@ -133,68 +125,47 @@ public class ServiceRegistry {
         }
     }
 
-    private static void registerFromPackage(String packageName, String packagePath, FileFilter fileFilter) {
-        File dir = new File(packagePath);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return;
-        }
-        File[] dirfiles = dir.listFiles(fileFilter);
-        assert dirfiles != null;
-        for (File file : dirfiles) {
-            if (file.isDirectory()) {
-                registerFromPackage(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter);
-            } else {
-                String className = file.getName().substring(0, file.getName().length() - 6);
-                register(packageName + "." + className);
-            }
-        }
+    /**
+     * 扫描注册服务
+     */
+    public static void registerServices() {
+        String bashPath = Context.getBashPath();
+        String name = Context.getPackageName();
+        ThreadPool.execute(
+                new RegistryThread(name,
+                        bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)),
+                        file -> file.isDirectory() || file.getName().endsWith(".class")));
     }
 
-    /**
-     * 复制于FileSystem的resolve
-     *
-     * @param parent 父路径
-     * @param child  子路径
-     * @return 结果
-     */
-    private static String combinePath(String parent, String child) {
-        if (StringUtils.isEmpty(parent)) return child;
-        if (StringUtils.isEmpty(child)) return parent;
-        int pn = parent.length();
-        int cn = child.length();
-        String c = child;
-        int childStart = 0;
-        int parentEnd = pn;
+    private static class RegistryThread extends Thread {
+        private String packageName;
+        private String path;
+        private FileFilter fileFilter;
 
-        if ((cn > 1) && (c.charAt(0) == SEPARATOR_CHAR)) {
-            if (c.charAt(1) == SEPARATOR_CHAR) {
-                childStart = 2;
-            } else {
-                childStart = 1;
-
-            }
-            if (cn == childStart) {
-                if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
-                    return parent.substring(0, pn - 1);
-                return parent;
-            }
+        RegistryThread(String packageName, String path, FileFilter fileFilter) {
+            this.packageName = packageName;
+            this.path = path;
+            this.fileFilter = fileFilter;
         }
 
-        if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
-            parentEnd--;
-
-        int strlen = parentEnd + cn - childStart;
-        char[] theChars = null;
-        if (child.charAt(childStart) == SEPARATOR_CHAR) {
-            theChars = new char[strlen];
-            parent.getChars(0, parentEnd, theChars, 0);
-            child.getChars(childStart, cn, theChars, parentEnd);
-        } else {
-            theChars = new char[strlen + 1];
-            parent.getChars(0, parentEnd, theChars, 0);
-            theChars[parentEnd] = SEPARATOR_CHAR;
-            child.getChars(childStart, cn, theChars, parentEnd + 1);
+        @Override
+        public void run() {
+            File dir = new File(path);
+            if (!dir.exists() || !dir.isDirectory()) {
+                return;
+            }
+            File[] dirFiles = dir.listFiles(fileFilter);
+            if (dirFiles == null) {
+                return;
+            }
+            for (File file : dirFiles) {
+                if (file.isDirectory()) {
+                    ThreadPool.execute(new RegistryThread(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter));
+                } else {
+                    String className = file.getName().substring(0, file.getName().length() - 6);
+                    register(packageName + "." + className);
+                }
+            }
         }
-        return new String(theChars);
     }
 }

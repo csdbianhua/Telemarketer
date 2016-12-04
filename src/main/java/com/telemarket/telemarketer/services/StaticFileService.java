@@ -8,7 +8,7 @@ import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
-import com.telemarket.telemarketer.util.TimeUtils;
+import com.telemarket.telemarketer.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -37,7 +37,7 @@ public class StaticFileService {
         }
         String ifModifiedSinceStr = request.getHeader("if-modified-since");
         if (StringUtils.isNotEmpty(ifModifiedSinceStr)) {
-            long isModifiedSince = TimeUtils.parseRFC822(ifModifiedSinceStr).toInstant().toEpochMilli();
+            long isModifiedSince = TimeUtil.parseRFC822(ifModifiedSinceStr).toInstant().toEpochMilli();
             if (file.lastModified() / 1000 <= isModifiedSince / 1000) {
                 return new Response(Status.NOT_MODIFIED_304);
             }
