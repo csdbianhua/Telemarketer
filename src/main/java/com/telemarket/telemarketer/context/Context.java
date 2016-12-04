@@ -128,7 +128,7 @@ public class Context {
         return true;
     }
 
-    private static boolean loadViewConfiguration() {
+    private static boolean loadViewConfiguration() { // TODO 配置使用ViewResolver
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
         try {
             cfg.setDirectoryForTemplateLoading(new File(PropertiesHelper.getResourcePath("template")));

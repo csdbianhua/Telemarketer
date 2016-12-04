@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.Properties;
 
 /**
- * 负责获取配置 TODO 迁移到Context，同时支持System properties合并
+ * 负责获取配置 TODO 迁移到Context，同时支持System properties，命令行参数合并
  */
 public class PropertiesHelper {
 

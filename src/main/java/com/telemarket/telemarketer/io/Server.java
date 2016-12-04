@@ -66,7 +66,7 @@ public class Server {
                     } else if (key.isReadable()) {
                         SocketChannel client = (SocketChannel) key.channel();
                         ThreadPool.execute(new Connector(client, selector));
-                        key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
+                        key.interestOps(key.interestOps() & ~SelectionKey.OP_READ); // TODO 等真正读完再取消
                     }
                 } catch (Exception e) {
                     LOGGER.error("socket channel 出错了", e);
