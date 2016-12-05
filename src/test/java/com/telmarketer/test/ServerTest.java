@@ -92,7 +92,7 @@ public class ServerTest {
             Assert.assertThat(line, CoreMatchers.containsString("200"));
         }
 
-
+        ServiceRegistry.unregister("/test_post");
     }
 
     @AfterClass
