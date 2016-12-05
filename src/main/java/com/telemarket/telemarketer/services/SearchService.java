@@ -32,8 +32,10 @@ public class SearchService {
         if (request.mimeContainKey("photo")) {
             MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
+            String fileName = photo.getFileName();
+            int i = fileName.lastIndexOf('.');
             try {
-                File file = File.createTempFile("test", ".jpeg");
+                File file = File.createTempFile("test", i == -1 ? ".jpeg" : fileName.substring(i, fileName.length() + 1));
                 FileOutputStream os = new FileOutputStream(file);
                 os.write(data);
                 os.close();

@@ -69,11 +69,11 @@ class RequestHeader {
     }
 
     public String getContentType() {
-        return head.get(HttpHeader.CONTENT_TYPE.toLowerCaseName());
+        return head.get(HttpHeader.CONTENT_TYPE.toLowerName());
     }
 
     public int getContentLength() {
-        return Integer.valueOf(head.getOrDefault(HttpHeader.CONTENT_LENGTH.toLowerCaseName(), "0"));
+        return Integer.valueOf(head.getOrDefault(HttpHeader.CONTENT_LENGTH.toLowerName(), "0"));
     }
 
 

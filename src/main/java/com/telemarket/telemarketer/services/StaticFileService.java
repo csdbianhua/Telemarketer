@@ -1,5 +1,6 @@
 package com.telemarket.telemarketer.services;
 
+import com.telemarket.telemarketer.http.HttpHeader;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
@@ -35,7 +36,7 @@ public class StaticFileService {
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             return new NotFoundResponse();
         }
-        String ifModifiedSinceStr = request.getHeader("if-modified-since");
+        String ifModifiedSinceStr = request.getHeader(HttpHeader.IF_MODIFIED_SINCE.toLowerName());
         if (StringUtils.isNotEmpty(ifModifiedSinceStr)) {
             long isModifiedSince = TimeUtil.parseRFC822(ifModifiedSinceStr).toInstant().toEpochMilli();
             if (file.lastModified() / 1000 <= isModifiedSince / 1000) {

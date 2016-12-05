@@ -81,16 +81,18 @@ public enum HttpHeader {
     STRICT_TRANSPORT_SECURITY("Strict-Transport-Security");
 
     private final String name;
+    private final String lowerName;
 
     HttpHeader(String name) {
         this.name = name;
+        lowerName = name.toLowerCase();
     }
 
     public String getName() {
         return name;
     }
 
-    public String toLowerCaseName() {
-        return name.toLowerCase();
+    public String toLowerName() {
+        return lowerName;
     }
 }
