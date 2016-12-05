@@ -62,6 +62,7 @@ public class ServerTest {
         Socket socket = new Socket("localhost", 8877);
         URL url = ClassLoader.getSystemResource("test_post.jpeg");
         Path pic = Paths.get(url.toURI());
+        byte[] data = Files.readAllBytes(pic);
         String msg = "POST /test_post HTTP/1.1\r\n" +
                 "Host: localhost:8877\r\n" +
                 "Connection: close\r\n" +
@@ -78,13 +79,13 @@ public class ServerTest {
                 "Accept-Language: zh-CN,zh;q=0.8,en;q=0.6\r\n" +
                 "\r\n" +
                 "------WebKitFormBoundaryBBXcj9WdDs43Pkjt\r\n" +
-                "Content-Disposition: form-data; name=\"img\"; filename=\"k8vEBoCW.jpeg\"\r\n" +
+                "Content-Disposition: form-data; name=\"photo\"; filename=\"k8vEBoCW.jpeg\"\r\n" +
                 "Content-Type: image/jpeg\r\n\r\n";
         try (InputStream is = socket.getInputStream();
              OutputStream os = socket.getOutputStream();
              BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
             os.write(msg.getBytes("utf-8"));
-            os.write(Files.readAllBytes(pic));
+            os.write(data);
             os.write("\r\n------WebKitFormBoundaryBBXcj9WdDs43Pkjt--\r\n".getBytes());
             os.flush();
             String line = br.readLine();

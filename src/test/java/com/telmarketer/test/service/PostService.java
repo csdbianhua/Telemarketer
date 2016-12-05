@@ -24,8 +24,8 @@ public class PostService {
 
     @Path(value = "/test_post", method = HttpMethod.POST)
     public Response testPost(Request request) {
-        if (request.mimeContainKey("img")) {
-            MimeData photo = request.mimeValue("img");
+        if (request.mimeContainKey("photo")) {
+            MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
             try {
                 File file = File.createTempFile("the", ".jpeg");
