@@ -195,8 +195,8 @@ public class RequestParser {
                 array = split[i].split("=", 2);
                 cookieArray[i] = new Cookie(array[0], array[1]);
             } catch (RuntimeException e) {
-                LOGGER.error("解析cookie出现问题", e);
-                cookieArray[i] = new Cookie(StringUtils.EMPTY, StringUtils.EMPTY);
+                LOGGER.error("非法cookie", e);
+                cookieArray[i] = new Cookie(StringUtils.EMPTY, StringUtils.EMPTY); // TODO 这里不能为空，如果出现了保留cookie怎么办
             }
         }
         return cookieArray;

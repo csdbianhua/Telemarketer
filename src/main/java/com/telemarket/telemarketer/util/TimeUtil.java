@@ -11,7 +11,7 @@ import java.util.Locale;
  * Date: 2016/12/1
  */
 public class TimeUtil {
-    private static final DateTimeFormatter RFC822 = DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+    private static final DateTimeFormatter RFC822 = DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
 
     public static ZonedDateTime parseRFC822(String timeStr) {
         return ZonedDateTime.parse(timeStr, RFC822);
