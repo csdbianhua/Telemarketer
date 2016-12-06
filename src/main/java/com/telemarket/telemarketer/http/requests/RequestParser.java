@@ -31,7 +31,7 @@ public class RequestParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestParser.class);
 
     public static Request parseRequest(SocketChannel channel) throws IllegalRequestException, IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);  // TODO ByteBuffer重用，ByteBuffer pool
         channel.read(buffer); //IOException
         buffer.flip();
         int remaining = buffer.remaining();

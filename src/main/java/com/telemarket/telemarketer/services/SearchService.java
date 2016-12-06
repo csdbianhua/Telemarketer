@@ -6,6 +6,7 @@ import com.telemarket.telemarketer.http.requests.MimeData;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.Response;
+import com.telemarket.telemarketer.mvc.annotation.MultiPart;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
@@ -28,7 +29,7 @@ public class SearchService {
     }
 
     @Path(value = "/search", method = HttpMethod.POST)
-    public Response service(Request request) {
+    public Response service(Request request, @MultiPart("photo") MimeData mimeData) {
         if (request.mimeContainKey("photo")) {
             MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
