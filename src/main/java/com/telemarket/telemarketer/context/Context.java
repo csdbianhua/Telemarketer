@@ -129,7 +129,7 @@ public class Context {
     }
 
     private static boolean loadViewConfiguration() { // TODO 配置使用ViewResolver
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
+        Configuration cfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         try {
             cfg.setDirectoryForTemplateLoading(new File(PropertiesHelper.getResourcePath("template")));
         } catch (IOException e) {

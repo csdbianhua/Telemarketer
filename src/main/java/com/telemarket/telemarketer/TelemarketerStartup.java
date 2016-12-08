@@ -8,8 +8,8 @@ import com.telemarket.telemarketer.io.Server;
  */
 public class TelemarketerStartup {
 
-    public static void main(String[] args) {
-        Context.init(args, TelemarketerStartup.class);
+    public static void run(String[] args, Class<?> clazz) {
+        Context.init(args, clazz);
         if (Context.isError()) {
             Context.printError();
             return;
@@ -18,5 +18,8 @@ public class TelemarketerStartup {
         server.start();
     }
 
+    public static void main(String[] args) {
+        TelemarketerStartup.run(args, TelemarketerStartup.class);
+    }
 
 }
