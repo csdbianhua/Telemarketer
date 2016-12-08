@@ -63,7 +63,7 @@ public class Context {
     }
 
     public static void init(String[] args, Class rootClazz) {
-        if (args.length < 1 || !args[0].equals("start")) {
+        if (args == null || args.length < 1 || !args[0].equals("start")) {
             errorMsg = "Usage: start [address:port]";
             return;
         }
@@ -91,9 +91,9 @@ public class Context {
         if (!loadLogConfiguration()) {
             return;
         }
-        if (!loadViewConfiguration()) {
-            return;
-        }
+//        if (!loadViewConfiguration()) {
+//            return;
+//        }
     }
 
     public static boolean isError() {
@@ -128,7 +128,7 @@ public class Context {
         return true;
     }
 
-    private static boolean loadViewConfiguration() {
+    private static boolean loadViewConfiguration() { // TODO 配置使用ViewResolver
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
         try {
             cfg.setDirectoryForTemplateLoading(new File(PropertiesHelper.getResourcePath("template")));

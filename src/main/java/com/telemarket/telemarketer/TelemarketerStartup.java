@@ -4,7 +4,7 @@ import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.io.Server;
 
 /**
- * 开始类
+ * 启动
  */
 public class TelemarketerStartup {
 

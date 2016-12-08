@@ -6,15 +6,13 @@ import com.telemarket.telemarketer.http.requests.MimeData;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.Response;
+import com.telemarket.telemarketer.mvc.annotation.MultiPart;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 import com.telemarket.telemarketer.util.PropertiesHelper;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -31,34 +29,22 @@ public class SearchService {
     }
 
     @Path(value = "/search", method = HttpMethod.POST)
-    public Response service(Request request) {
+    public Response service(Request request, @MultiPart("photo") MimeData mimeData) {
         if (request.mimeContainKey("photo")) {
             MimeData photo = request.mimeValue("photo");
             byte[] data = photo.getData();
+            String fileName = photo.getFileName();
+            int i = fileName.lastIndexOf('.');
             try {
-                BufferedImage read = ImageIO.read(new ByteArrayInputStream(data));
-                if (read == null) {
-                    return new Response(Status.BAD_REQUEST_400);
-                }
-                showImage(read);
+                File file = File.createTempFile("test", i == -1 ? ".jpeg" : fileName.substring(i, fileName.length()));
+                FileOutputStream os = new FileOutputStream(file);
+                os.write(data);
+                os.close();
+                return new FileResponse(Status.SUCCESS_200, file);
             } catch (IOException e) {
-                return new Response(Status.BAD_REQUEST_400);
+                return new Response(Status.INTERNAL_SERVER_ERROR_500);
             }
-        } else {
-            return new Response(Status.BAD_REQUEST_400);
         }
-        return new FileResponse(Status.SUCCESS_200, PropertiesHelper.getTemplateFile("search.html"));
+        return new Response(Status.BAD_REQUEST_400);
     }
-
-    public static void showImage(BufferedImage image) {
-        ImageIcon ic = new ImageIcon(image);
-        JFrame world = new JFrame("World");
-        JLabel jLabel = new JLabel(ic);
-        Panel panel = new Panel();
-        panel.add(jLabel);
-        world.setContentPane(panel);
-        world.setSize(image.getWidth(), image.getHeight());
-        world.setVisible(true);
-    }
-
 }

@@ -32,6 +32,9 @@ public class Server {
             return;
         }
         while (true) {
+            if (!selector.isOpen()) {
+                break;
+            }
             try {
                 if (selector.select() == 0) {
                     continue;
@@ -55,7 +58,7 @@ public class Server {
                     } else if (key.isWritable()) {
                         SocketChannel client = (SocketChannel) key.channel();
                         Response response = (Response) key.attachment();
-                        ByteBuffer byteBuffer = response.getByteBuffer();
+                        ByteBuffer byteBuffer = response.getByteBuffer(); // TODO 考虑修改为获取流
                         if (byteBuffer.hasRemaining()) {
                             client.write(byteBuffer);
                         }
@@ -106,5 +109,12 @@ public class Server {
         return true;
     }
 
+    public void destory() {
+        try {
+            selector.close();
+        } catch (IOException e) {
+            LOGGER.error("关闭selector失败", e);
+        }
+    }
 
 }

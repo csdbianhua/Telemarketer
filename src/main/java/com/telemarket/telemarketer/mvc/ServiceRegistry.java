@@ -3,8 +3,10 @@ package com.telemarket.telemarketer.mvc;
 import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.requests.Request;
+import com.telemarket.telemarketer.io.ThreadPool;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.util.FileUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +25,6 @@ import java.util.regex.Matcher;
  */
 public class ServiceRegistry {
 
-    private static final char SEPARATOR_CHAR = '/';
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
     private static Map<String, ServiceMethodInfo> services = Collections.synchronizedMap(new TreeMap<String, ServiceMethodInfo>());
 
@@ -43,7 +44,13 @@ public class ServiceRegistry {
      * @param path 路径
      */
     public static void unregister(String path) {
-        services.remove(path);
+        ServiceMethodInfo remove = services.remove(path);
+        if (remove != null) {
+            LOGGER.info("取消注册服务,path:{},method:{}.{}",
+                    path,
+                    remove.getObject().getClass().getName(),
+                    remove.getMethod().getName());
+        }
     }
 
     public static boolean containPattern(String pattern) {
@@ -67,114 +74,108 @@ public class ServiceRegistry {
     }
 
     /**
-     * 注册服务 TODO 可以使用多线程
+     * 动态注册服务
+     *
+     * @param className 服务类名
+     * @return 注册成功返回true
      */
-    public static void registerServices() {
-        String bashPath = Context.getBashPath();
-        String name = Context.getPackageName();
-        registerFromPackage(name, bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)), file -> file.isDirectory() || file.getName().endsWith(".class"));
-    }
-
-    private static void registerFromPackage(String packageName, String packagePath, FileFilter fileFilter) {
-        File dir = new File(packagePath);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return;
+    public static boolean registerClass(String className) {
+        if (StringUtils.isBlank(className)) {
+            return false;
         }
-        File[] dirfiles = dir.listFiles(fileFilter);
-        assert dirfiles != null;
-        for (File file : dirfiles) {
-            if (file.isDirectory()) {
-                registerFromPackage(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter);
-            } else {
-                String className = file.getName().substring(0, file.getName().length() - 6);
-                try {
-                    Class<?> aClass = Class.forName(packageName + "." + className);
-                    Service annotation = aClass.getAnnotation(Service.class);
-                    if (annotation != null) {
-                        Path classAnnotation = aClass.getAnnotation(Path.class);
-                        String classPath = StringUtils.EMPTY;
-                        HttpMethod[] classHttpMethod = null;
-                        if (classAnnotation != null) {
-                            classPath = classAnnotation.value();
-                            classHttpMethod = classAnnotation.method();
+        try {
+            Class<?> clazz = Class.forName(className);
+            Service annotation = clazz.getAnnotation(Service.class);
+            boolean flag = false;
+            if (annotation != null) {
+                Path classAnnotation = clazz.getAnnotation(Path.class);
+                String[] classPath = new String[]{"/"};
+                HttpMethod[] classHttpMethod = null;
+                if (classAnnotation != null) {
+                    classPath = classAnnotation.value();
+                    classHttpMethod = classAnnotation.method();
+                }
+                Method[] methods = clazz.getMethods();
+                Object controller = clazz.newInstance();
+                for (Method method : methods) {
+                    Path methodAnnotation = method.getAnnotation(Path.class);
+                    if (methodAnnotation == null) {
+                        continue;
+                    }
+                    String[] methodPath = methodAnnotation.value();
+                    HttpMethod[] httpMethod = methodAnnotation.method();
+                    if (ArrayUtils.isEmpty(httpMethod)) {
+                        if (ArrayUtils.isEmpty(classHttpMethod)) {
+                            httpMethod = new HttpMethod[]{HttpMethod.GET};
+                        } else {
+                            httpMethod = classHttpMethod;
                         }
-                        Method[] methods = aClass.getMethods();
-                        Object controller = aClass.newInstance();
-                        for (Method method : methods) {
-                            Path methodAnnotation = method.getAnnotation(Path.class);
-                            if (methodAnnotation == null) {
-                                continue;
-                            }
-                            String methodPath = methodAnnotation.value();
-                            HttpMethod[] httpMethod = methodAnnotation.method();
-                            if (ArrayUtils.isEmpty(httpMethod)) {
-                                if (ArrayUtils.isEmpty(classHttpMethod)) {
-                                    httpMethod = new HttpMethod[]{HttpMethod.GET};
-                                } else {
-                                    httpMethod = classHttpMethod;
-                                }
-                            }
-                            ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
-                            String path = combinePath(classPath, methodPath);
+                    }
+                    ServiceMethodInfo info = new ServiceMethodInfo(controller, method, httpMethod);
+                    for (String cP : classPath) {
+                        for (String s : methodPath) {
+                            String path = FileUtil.combinePath(cP, s);
                             if (containPattern(path)) {
                                 LOGGER.warn("request map存在重复,映射路径为'{}',将被覆盖!", path);
                             }
                             register(path, info);
-                            LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, className, method.getName());
+                            flag = true;
+                            LOGGER.info("成功注册服务,映射[{}]到[{}.{}]", path, clazz.getName(), method.getName());
                         }
                     }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    LOGGER.warn("注册服务出错", e);
                 }
             }
+            return flag;
+        } catch (InstantiationException | IllegalAccessException e) {
+            LOGGER.error("无法访问服务构造器,{}", className, e);
+            return false;
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("无法找到服务类,{}", className, e);
+            return false;
         }
     }
 
     /**
-     * 复制于FileSystem的resolve
-     *
-     * @param parent 父路径
-     * @param child  子路径
-     * @return 结果
+     * 扫描注册服务
      */
-    private static String combinePath(String parent, String child) {
-        if (StringUtils.isEmpty(parent)) return child;
-        if (StringUtils.isEmpty(child)) return parent;
-        int pn = parent.length();
-        int cn = child.length();
-        String c = child;
-        int childStart = 0;
-        int parentEnd = pn;
+    public static void registerServices() {
+        String bashPath = Context.getBashPath();
+        String name = Context.getPackageName();
+        ThreadPool.execute(
+                new RegistryThread(name,
+                        bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)),
+                        file -> file.isDirectory() || file.getName().endsWith(".class")));
+    }
 
-        if ((cn > 1) && (c.charAt(0) == SEPARATOR_CHAR)) {
-            if (c.charAt(1) == SEPARATOR_CHAR) {
-                childStart = 2;
-            } else {
-                childStart = 1;
+    private static class RegistryThread extends Thread {
+        private String packageName;
+        private String path;
+        private FileFilter fileFilter;
 
-            }
-            if (cn == childStart) {
-                if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
-                    return parent.substring(0, pn - 1);
-                return parent;
-            }
+        RegistryThread(String packageName, String path, FileFilter fileFilter) {
+            this.packageName = packageName;
+            this.path = path;
+            this.fileFilter = fileFilter;
         }
 
-        if (parent.charAt(pn - 1) == SEPARATOR_CHAR)
-            parentEnd--;
-
-        int strlen = parentEnd + cn - childStart;
-        char[] theChars = null;
-        if (child.charAt(childStart) == SEPARATOR_CHAR) {
-            theChars = new char[strlen];
-            parent.getChars(0, parentEnd, theChars, 0);
-            child.getChars(childStart, cn, theChars, parentEnd);
-        } else {
-            theChars = new char[strlen + 1];
-            parent.getChars(0, parentEnd, theChars, 0);
-            theChars[parentEnd] = SEPARATOR_CHAR;
-            child.getChars(childStart, cn, theChars, parentEnd + 1);
+        @Override
+        public void run() {
+            File dir = new File(path);
+            if (!dir.exists() || !dir.isDirectory()) {
+                return;
+            }
+            File[] dirFiles = dir.listFiles(fileFilter);
+            if (dirFiles == null) {
+                return;
+            }
+            for (File file : dirFiles) {
+                if (file.isDirectory()) {
+                    ThreadPool.execute(new RegistryThread(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter));
+                } else {
+                    String className = file.getName().substring(0, file.getName().length() - 6);
+                    registerClass(packageName + "." + className);
+                }
+            }
         }
-        return new String(theChars);
     }
 }

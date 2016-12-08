@@ -4,7 +4,10 @@ package com.telemarket.telemarketer.http;
  * Hanson on 2016/11/29 13:33.
  */
 public enum HttpMethod {
-    GET("get"), POST("post");
+    GET("GET"),
+    POST("POST"),
+    HEAD("HEAD"), // TODO HEAD 方法
+    OPTIONS("OPTIONS"); // TODO OPTIONS 方法
 
     private String name;
 
@@ -15,4 +18,6 @@ public enum HttpMethod {
     public String getName() {
         return name;
     }
+
+
 }

@@ -31,8 +31,7 @@ public class RequestParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestParser.class);
 
     public static Request parseRequest(SocketChannel channel) throws IllegalRequestException, IOException {
-
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);  // TODO ByteBuffer重用，ByteBuffer pool
         channel.read(buffer); //IOException
         buffer.flip();
         int remaining = buffer.remaining();
@@ -184,7 +183,7 @@ public class RequestParser {
         if (MapUtils.isEmpty(headMap)) {
             return new Cookie[0];
         }
-        String cookies = headMap.get("Cookie");
+        String cookies = headMap.get("cookie");
         if (StringUtils.isBlank(cookies)) {
             return new Cookie[0];
         }
@@ -196,8 +195,8 @@ public class RequestParser {
                 array = split[i].split("=", 2);
                 cookieArray[i] = new Cookie(array[0], array[1]);
             } catch (RuntimeException e) {
-                LOGGER.error("解析cookie出现问题", e);
-                cookieArray[i] = new Cookie(StringUtils.EMPTY, StringUtils.EMPTY);
+                LOGGER.error("非法cookie", e);
+                cookieArray[i] = new Cookie(StringUtils.EMPTY, StringUtils.EMPTY); // TODO 这里不能为空，如果出现了保留cookie怎么办
             }
         }
         return cookieArray;

@@ -3,7 +3,7 @@ package com.telemarket.telemarketer.http.responses;
 import com.telemarket.telemarketer.exceptions.NotSupportMethodException;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.util.PropertiesHelper;
-import com.telemarket.telemarketer.util.TimeUtils;
+import com.telemarket.telemarketer.util.TimeUtil;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -34,7 +34,7 @@ public class Response implements HttpServletResponse {
         this.status = status;
         heads = new HashMap<>();
         content = new byte[0];
-        heads.put("Date", TimeUtils.toRFC822(ZonedDateTime.now()));
+        heads.put("Date", TimeUtil.toRFC822(ZonedDateTime.now()));
         heads.put("Server", PropertiesHelper.getProperty("server_name", "Telemarketer"));
         heads.put("Connection", "Close"); // TODO keep-alive
     }
@@ -157,6 +157,8 @@ public class Response implements HttpServletResponse {
 
     private ByteBuffer finalData = null;
 
+
+    // TODO 解耦HTTP生成
     public ByteBuffer getByteBuffer() {
         if (finalData == null) {
             heads.put("Content-Length", String.valueOf(content.length));

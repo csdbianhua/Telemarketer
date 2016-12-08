@@ -57,6 +57,10 @@ public class Request implements HttpServletRequest {
         return header.queryValue(key);
     }
 
+    public Collection<String> formValue(String key) {
+        return body.getFormMap().get(key);
+    }
+
     public boolean formContainKey(String key) {
         return body.formContainKey(key);
     }
