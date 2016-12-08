@@ -36,7 +36,7 @@ public class SearchService {
             String fileName = photo.getFileName();
             int i = fileName.lastIndexOf('.');
             try {
-                File file = File.createTempFile("test", i == -1 ? ".jpeg" : fileName.substring(i, fileName.length() + 1));
+                File file = File.createTempFile("test", i == -1 ? ".jpeg" : fileName.substring(i, fileName.length()));
                 FileOutputStream os = new FileOutputStream(file);
                 os.write(data);
                 os.close();
