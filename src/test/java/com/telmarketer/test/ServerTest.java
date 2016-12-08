@@ -9,6 +9,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,9 +21,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 测试基础功能
+ * <p>
  * Be careful!
  * Created by hason on 15/9/18.
  */
+@RunWith(JUnit4.class)
 public class ServerTest {
 
     private static Server server;

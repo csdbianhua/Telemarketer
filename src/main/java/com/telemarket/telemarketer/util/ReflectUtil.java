@@ -1,5 +1,6 @@
 package com.telemarket.telemarketer.util;
 
+import com.telemarket.telemarketer.exceptions.TransformTypeException;
 import com.telemarket.telemarketer.http.requests.MimeData;
 
 import java.util.HashMap;
@@ -24,29 +25,43 @@ public class ReflectUtil {
         Function<Object, Object> intFunction = s -> Integer.parseInt((String) s);
         Function<Object, Object> doubleFunction = s -> Double.parseDouble((String) s);
         Function<Object, Object> floatFunction = s -> Float.parseFloat((String) s);
-        TYPE_FUNCTION_MAP.put(Boolean.class, s -> boolFunction);
-        TYPE_FUNCTION_MAP.put(boolean.class, s -> boolFunction);
+        Function<Object, Object> charFunction = s -> ((String) s).charAt(0);
+        TYPE_FUNCTION_MAP.put(Boolean.class, boolFunction);
         TYPE_FUNCTION_MAP.put(String.class, String::valueOf);
         TYPE_FUNCTION_MAP.put(Long.class, longFunction);
-        TYPE_FUNCTION_MAP.put(long.class, longFunction);
         TYPE_FUNCTION_MAP.put(Integer.class, intFunction);
-        TYPE_FUNCTION_MAP.put(int.class, intFunction);
         TYPE_FUNCTION_MAP.put(Double.class, doubleFunction);
-        TYPE_FUNCTION_MAP.put(double.class, doubleFunction);
         TYPE_FUNCTION_MAP.put(Float.class, floatFunction);
-        TYPE_FUNCTION_MAP.put(float.class, floatFunction);
-        TYPE_FUNCTION_MAP.put(byte[].class, o -> {
-            if (o instanceof MimeData) {
-                return ((MimeData) o).getData();
-            } else {
-                return null;
-            }
-        });
+        TYPE_FUNCTION_MAP.put(Character.class, charFunction);
+        TYPE_FUNCTION_MAP.put(byte[].class, o -> ((MimeData) o).getData());
         TYPE_FUNCTION_MAP.put(MimeData.class, o -> o);
 
     }
 
+    /**
+     * 转换对象到指定类型,可能抛出ClassCastException
+     *
+     * @param val  对象
+     * @param type 指定类型
+     * @return 转换结果
+     */
     public static Object parseObj(Object val, Class<?> type) {
-        return TYPE_FUNCTION_MAP.getOrDefault(type, MISS_FUNCTION).apply(val);
+        if (val == null) {
+            return null;
+        }
+        Object result;
+        try {
+            result = TYPE_FUNCTION_MAP.getOrDefault(type, MISS_FUNCTION).apply(val);
+            valid(result, type);
+        } catch (RuntimeException e) {
+            throw new TransformTypeException("parseObj error,target type:" + type.getName(), e);
+        }
+        return result;
+    }
+
+    private static void valid(Object val, Class<?> type) {
+        if (val != null && val.getClass() != type) {
+            throw new ClassCastException(val.getClass().getName() + " cannot be cast to " + type.getName());
+        }
     }
 }
