@@ -109,7 +109,7 @@ public class Server {
         return true;
     }
 
-    public void destory() {
+    public void destroy() {
         try {
             selector.close();
         } catch (IOException e) {
