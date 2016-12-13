@@ -49,17 +49,12 @@
                 <filtering>false</filtering>
             </resource>
             <resource>
-                <directory>src/main/resource</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.6.Final</version>
-        </dependency>
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>

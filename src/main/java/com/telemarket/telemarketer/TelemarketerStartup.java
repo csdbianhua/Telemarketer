@@ -8,7 +8,7 @@ import com.telemarket.telemarketer.io.Server;
  */
 public class TelemarketerStartup {
 
-    public static void run(String[] args, Class<?> clazz) {
+    public static void run(String[] args, Class<?>... clazz) {
         Context.init(args, clazz);
         if (Context.isError()) {
             Context.printError();

@@ -1,5 +1,5 @@
 .idea
 target/
 telemarket.iml
-src/main/resource/rebel.xml
+src/main/resources/rebel.xml
 logs
