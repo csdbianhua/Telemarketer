@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Chen Yijie on 2016/11/27 21:08.
@@ -23,19 +26,10 @@ import java.net.UnknownHostException;
 public class Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(Context.class);
     public static final int DEFAULT_PORT = 8877;
-    private static String bashPath;
-    private static String packageName;
     private static InetAddress ip;
     private static int port;
     private static String errorMsg;
-
-    static void setBashPath(String bashPath) {
-        Context.bashPath = bashPath;
-    }
-
-    static void setPackageName(String packageName) {
-        Context.packageName = packageName;
-    }
+    private static Map<Class, ScanConfig> scanConfig;
 
     static void setIp(InetAddress inetAddress) {
         Context.ip = inetAddress;
@@ -43,15 +37,6 @@ public class Context {
 
     static void setPort(int port) {
         Context.port = port;
-    }
-
-    public static String getBashPath() {
-        return bashPath;
-    }
-
-
-    public static String getPackageName() {
-        return packageName;
     }
 
     public static InetAddress getIp() {
@@ -62,7 +47,7 @@ public class Context {
         return port;
     }
 
-    public static void init(String[] args, Class rootClazz) {
+    public static void init(String[] args, Class... scanClazz) {
         if (args == null || args.length < 1 || !args[0].equals("start")) {
             errorMsg = "Usage: start [address:port]";
             return;
@@ -81,10 +66,13 @@ public class Context {
             errorMsg = "请输入正确的ip";
             return;
         }
-        String homePath = rootClazz.getResource("/").getPath();
-        String packageName = rootClazz.getPackage().getName();
-        Context.setBashPath(homePath);
-        Context.setPackageName(packageName);
+        HashMap<Class, ScanConfig> scanConfigs = new HashMap<>();
+        for (Class aClass : scanClazz) {
+            String homePath = aClass.getResource("/").getPath();
+            String packageName = aClass.getPackage() == null ? StringUtils.EMPTY : aClass.getPackage().getName();
+            scanConfigs.put(aClass, new ScanConfig(homePath, packageName));
+        }
+        Context.setScanConfig(scanConfigs);
         Context.setIp(ip);
         Context.setPort(port);
 
@@ -129,7 +117,7 @@ public class Context {
     }
 
     private static boolean loadViewConfiguration() { // TODO 配置使用ViewResolver
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
+        Configuration cfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         try {
             cfg.setDirectoryForTemplateLoading(new File(PropertiesHelper.getResourcePath("template")));
         } catch (IOException e) {
@@ -140,5 +128,13 @@ public class Context {
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(true);
         return true;
+    }
+
+    public static void setScanConfig(Map<Class, ScanConfig> scanConfig) {
+        Context.scanConfig = Collections.unmodifiableMap(scanConfig);
+    }
+
+    public static Map<Class, ScanConfig> getScanConfig() {
+        return scanConfig;
     }
 }

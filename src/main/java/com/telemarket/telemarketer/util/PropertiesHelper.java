@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -23,11 +23,10 @@ public class PropertiesHelper {
 
     static {
         properties = new Properties();
-        String setting = ClassLoader.getSystemResource("setting.properties").getPath();
-        try (FileInputStream fileStream = new FileInputStream(setting)) {
-            properties.load(fileStream);
+        try (InputStream stream = ClassLoader.getSystemResourceAsStream("setting.properties")) {
+            properties.load(stream);
         } catch (IOException e) {
-            logger.error("配置文件无法读取 : " + setting);
+            logger.error("配置文件无法读取 setting.properties", e);
             System.exit(1);
         }
         URL resource = PropertiesHelper.class.getClassLoader().getResource("");

@@ -14,7 +14,6 @@
         </filter>
     </appender>
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录WARN级别的日志 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -83,7 +82,7 @@
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
+    <root>
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="INFO" />
         <appender-ref ref="WARN" />

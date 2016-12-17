@@ -94,6 +94,9 @@ public class RequestParser {
         String[] paras = s.split("&");
         for (String para : paras) {
             String[] split = para.split("=");
+            if (split.length != 2) {
+                continue;
+            }
             requestParameters.put(split[0], split[1]);
         }
     }

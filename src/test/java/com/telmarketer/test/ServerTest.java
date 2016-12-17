@@ -102,6 +102,6 @@ public class ServerTest {
 
     @AfterClass
     public static void destroyContext() {
-        server.destory();
+        server.destroy();
     }
 }

@@ -1,6 +1,7 @@
 package com.telemarket.telemarketer.mvc;
 
 import com.telemarket.telemarketer.context.Context;
+import com.telemarket.telemarketer.context.ScanConfig;
 import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.io.ThreadPool;
@@ -139,12 +140,14 @@ public class ServiceRegistry {
      * 扫描注册服务
      */
     public static void registerServices() {
-        String bashPath = Context.getBashPath();
-        String name = Context.getPackageName();
-        ThreadPool.execute(
-                new RegistryThread(name,
-                        bashPath + name.replaceAll("\\.", Matcher.quoteReplacement(File.separator)),
-                        file -> file.isDirectory() || file.getName().endsWith(".class")));
+        Map<Class, ScanConfig> scanConfig = Context.getScanConfig();
+        for (Map.Entry<Class, ScanConfig> entry : scanConfig.entrySet()) {
+            ScanConfig config = entry.getValue();
+            ThreadPool.execute(
+                    new RegistryThread(config.getPackageName(),
+                            FileUtil.combinePath(config.getHomePath(), config.getPackageName().replaceAll("\\.", Matcher.quoteReplacement(File.separator))),
+                            file -> file.isDirectory() || file.getName().endsWith(".class")));
+        }
     }
 
     private static class RegistryThread extends Thread {
@@ -168,12 +171,15 @@ public class ServiceRegistry {
             if (dirFiles == null) {
                 return;
             }
+            if (StringUtils.isNotBlank(packageName)) {
+                packageName = packageName + ".";
+            }
             for (File file : dirFiles) {
                 if (file.isDirectory()) {
-                    ThreadPool.execute(new RegistryThread(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter));
+                    ThreadPool.execute(new RegistryThread(packageName + file.getName(), file.getAbsolutePath(), fileFilter));
                 } else {
                     String className = file.getName().substring(0, file.getName().length() - 6);
-                    registerClass(packageName + "." + className);
+                    registerClass(packageName + className);
                 }
             }
         }
