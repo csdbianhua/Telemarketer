@@ -18,9 +18,11 @@ first make it work, then make it fast
 
 ``` java
 import com.telemarket.telemarketer.TelemarketerStartup;
+import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.responses.JsonResponse;
 import com.telemarket.telemarketer.mvc.annotation.Path;
+import com.telemarket.telemarketer.mvc.annotation.QueryParam;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 
 import java.util.Map;
@@ -30,18 +32,19 @@ import java.util.TreeMap;
 @Path("/")
 public class HelloWorldService {
 
-    @Path
-    public JsonResponse helloWorld() {
+    @Path(value = "/", method = HttpMethod.GET)
+    public JsonResponse helloWorld(@QueryParam("name") String name) {
         Map<String, String> obj = new TreeMap<String, String>();
-        obj.put("hello", "world");
+        obj.put("hello", name);
         return new JsonResponse(Status.SUCCESS_200, obj);
     }
 
     public static void main(String[] args) {
-        // 第二个参数为需要注册为控制器的的包下的随意一个类
-        TelemarketerStartup.run(args, HelloWorldService.class);
+        // 第二个参数为需要注册为控制器的的包下的随意一个类 可以使用多个
+        TelemarketerStartup.run(new String[]{"start"}, HelloWorldService.class);
     }
 }
+
 
 ```
 
