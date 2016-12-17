@@ -12,7 +12,7 @@ public class ThreadPool {
     private static ThreadPoolExecutor threadPoolExecutor;
 
     static {
-        threadPoolExecutor = new ThreadPoolExecutor(20,
+        threadPoolExecutor = new ThreadPoolExecutor(50,
                 200,
                 60,
                 TimeUnit.SECONDS,
