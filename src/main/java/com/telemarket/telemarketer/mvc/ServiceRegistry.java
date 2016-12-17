@@ -171,12 +171,15 @@ public class ServiceRegistry {
             if (dirFiles == null) {
                 return;
             }
+            if (StringUtils.isNotBlank(packageName)) {
+                packageName = packageName + ".";
+            }
             for (File file : dirFiles) {
                 if (file.isDirectory()) {
-                    ThreadPool.execute(new RegistryThread(packageName + "." + file.getName(), file.getAbsolutePath(), fileFilter));
+                    ThreadPool.execute(new RegistryThread(packageName + file.getName(), file.getAbsolutePath(), fileFilter));
                 } else {
                     String className = file.getName().substring(0, file.getName().length() - 6);
-                    registerClass(packageName + "." + className);
+                    registerClass(packageName + className);
                 }
             }
         }

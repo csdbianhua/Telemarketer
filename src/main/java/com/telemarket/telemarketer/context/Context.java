@@ -69,7 +69,7 @@ public class Context {
         HashMap<Class, ScanConfig> scanConfigs = new HashMap<>();
         for (Class aClass : scanClazz) {
             String homePath = aClass.getResource("/").getPath();
-            String packageName = aClass.getPackage().getName();
+            String packageName = aClass.getPackage() == null ? StringUtils.EMPTY : aClass.getPackage().getName();
             scanConfigs.put(aClass, new ScanConfig(homePath, packageName));
         }
         Context.setScanConfig(scanConfigs);
