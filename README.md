@@ -2,7 +2,7 @@
 
 Telemarketer 是一个简单的web服务器,同时也提供了一个简单的Web框架。只是因为有个小需求而不想使用重量级的Web服务器而做。
 
-仅支持Java version >= 1.8
+仅支持Java version >= 1.8 , Develop分支为最新代码
 
 first make it work, then make it fast
 
