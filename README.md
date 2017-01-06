@@ -57,3 +57,5 @@ HttpServletRequest 无需标注即可注入，其他参数默认当成javabean�
 
 目前必须返回com.telemarket.telemarketer.http.responses.Response
 
+#Licence
+Telemarketer is released under the [MIT License](http://www.opensource.org/licenses/MIT).

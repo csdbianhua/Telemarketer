@@ -9,7 +9,6 @@ import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.mvc.annotation.MultiPart;
 import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
-import com.telemarket.telemarketer.util.PropertiesHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,15 +22,9 @@ import java.io.IOException;
 @Service
 public class SearchService {
 
-    @Path("/test")
-    public Response test(Request request) {
-        return new FileResponse(Status.SUCCESS_200, PropertiesHelper.getTemplateFile("search.html"));
-    }
-
     @Path(value = "/search", method = HttpMethod.POST)
-    public Response service(Request request, @MultiPart("photo") MimeData mimeData) {
-        if (request.mimeContainKey("photo")) {
-            MimeData photo = request.mimeValue("photo");
+    public Response service(Request request, @MultiPart("photo") MimeData photo) {
+        if (photo != null) {
             byte[] data = photo.getData();
             String fileName = photo.getFileName();
             int i = fileName.lastIndexOf('.');
