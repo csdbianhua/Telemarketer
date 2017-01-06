@@ -5,8 +5,10 @@ import com.telemarket.telemarketer.context.ScanConfig;
 import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.io.ThreadPool;
-import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.mvc.annotation.WebPath;
+import com.telemarket.telemarketer.services.IndexService;
+import com.telemarket.telemarketer.services.StaticFileService;
 import com.telemarket.telemarketer.util.FileUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +91,7 @@ public class ServiceRegistry {
             Service annotation = clazz.getAnnotation(Service.class);
             boolean flag = false;
             if (annotation != null) {
-                Path classAnnotation = clazz.getAnnotation(Path.class);
+                WebPath classAnnotation = clazz.getAnnotation(WebPath.class);
                 String[] classPath = new String[]{"/"};
                 HttpMethod[] classHttpMethod = null;
                 if (classAnnotation != null) {
@@ -99,7 +101,7 @@ public class ServiceRegistry {
                 Method[] methods = clazz.getMethods();
                 Object controller = clazz.newInstance();
                 for (Method method : methods) {
-                    Path methodAnnotation = method.getAnnotation(Path.class);
+                    WebPath methodAnnotation = method.getAnnotation(WebPath.class);
                     if (methodAnnotation == null) {
                         continue;
                     }
@@ -141,6 +143,9 @@ public class ServiceRegistry {
      */
     public static void registerServices() {
         Map<Class, ScanConfig> scanConfig = Context.getScanConfig();
+        registerClass(IndexService.class.getCanonicalName());
+        registerClass(StaticFileService.class.getCanonicalName());
+
         for (Map.Entry<Class, ScanConfig> entry : scanConfig.entrySet()) {
             ScanConfig config = entry.getValue();
             ThreadPool.execute(

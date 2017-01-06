@@ -7,8 +7,8 @@ import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.Response;
 import com.telemarket.telemarketer.mvc.annotation.MultiPart;
-import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.mvc.annotation.WebPath;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @Service
 public class PostService {
 
-    @Path(value = "/test_post", method = HttpMethod.POST)
+    @WebPath(value = "/test_post", method = HttpMethod.POST)
     public Response testPost(Request request, @MultiPart(value = "photo", require = true) MimeData photo) {
 
         byte[] data = photo.getData();

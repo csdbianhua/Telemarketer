@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Service
-@Path("/")
+@WebPath("/")
 public class HelloWorldService {
 
-    @Path(value = "/", method = HttpMethod.GET)
+    @WebPath(value = "/", method = HttpMethod.GET)
     public JsonResponse helloWorld(@QueryParam("name") String name) {
         Map<String, String> obj = new TreeMap<String, String>();
         obj.put("hello", name);
@@ -50,7 +50,7 @@ public class HelloWorldService {
 
 #MVC使用方式(目前只实现了C)
 使用`@Service`标注控制器
-使用`@Path`标注路径
+使用`@WebPath`标注路径
 
 使用`@FormParam`注入form数据，`@QueryParam`注入query数据，`@MultiPart`注入MultiplePart数据
 HttpServletRequest 无需标注即可注入，其他参数默认当成javabean使用参数绑定机制
