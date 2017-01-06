@@ -6,8 +6,8 @@ import com.telemarket.telemarketer.http.requests.Request;
 import com.telemarket.telemarketer.http.responses.FileResponse;
 import com.telemarket.telemarketer.http.responses.NotFoundResponse;
 import com.telemarket.telemarketer.http.responses.Response;
-import com.telemarket.telemarketer.mvc.annotation.Path;
 import com.telemarket.telemarketer.mvc.annotation.Service;
+import com.telemarket.telemarketer.mvc.annotation.WebPath;
 import com.telemarket.telemarketer.util.PropertiesHelper;
 import com.telemarket.telemarketer.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,7 @@ public class StaticFileService {
         root = StaticFileService.class.getClassLoader().getResource("").getPath();
     }
 
-    @Path(StaticFileService.prefix + ".*")
+    @WebPath(StaticFileService.prefix + ".*")
     public Response service(Request request) {
         String filePath = staticPath + File.separator + request.getRequestURI().replaceAll(prefix, "");
         File file = new File(root, filePath);

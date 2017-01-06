@@ -1,6 +1,6 @@
 package com.telemarket.telemarketer.http.responses;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSONObject;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.exceptions.ServerInternalException;
 
@@ -17,7 +17,7 @@ public class JsonResponse extends Response {
         }
         heads.put("Content-Type", "application/json; charset=" + DEFAULT_CHARSET);
         try {
-            super.content = new Gson().toJson(obj).getBytes(DEFAULT_CHARSET);
+            super.content = JSONObject.toJSONString(obj).getBytes(DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException ignored) {
         }
 

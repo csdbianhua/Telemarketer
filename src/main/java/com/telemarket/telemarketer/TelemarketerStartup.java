@@ -2,7 +2,6 @@ package com.telemarket.telemarketer;
 
 import com.telemarket.telemarketer.context.Context;
 import com.telemarket.telemarketer.io.Server;
-import com.telemarket.telemarketer.services.IndexService;
 
 /**
  * 启动类
@@ -26,7 +25,7 @@ public class TelemarketerStartup {
     }
 
     public static void main(String[] args) {
-        TelemarketerStartup.run(args, IndexService.class);
+        TelemarketerStartup.run(args);
     }
 
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Path {
+public @interface WebPath {
     String[] value() default {"/"};
 
     HttpMethod[] method() default {};

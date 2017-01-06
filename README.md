@@ -1,8 +1,8 @@
 #Telemarketer
 
-Telemarketer 是一个简单的web服务器,同时也提供了一个简单的Web框架。只是因为有个小需求而不想使用重量级的Web服务器而做。
+Telemarketer 是一个嵌入式的web服务器,同时也提供了一个简单的Web框架。只是因为当时有个小需求而不想使用重量级的Web服务器而做。
 
-仅支持Java version >= 1.8
+仅支持Java version >= 1.8 , Develop分支为最新代码
 
 first make it work, then make it fast
 
@@ -18,39 +18,44 @@ first make it work, then make it fast
 
 ``` java
 import com.telemarket.telemarketer.TelemarketerStartup;
+import com.telemarket.telemarketer.http.HttpMethod;
 import com.telemarket.telemarketer.http.Status;
 import com.telemarket.telemarketer.http.responses.JsonResponse;
 import com.telemarket.telemarketer.mvc.annotation.Path;
+import com.telemarket.telemarketer.mvc.annotation.QueryParam;
 import com.telemarket.telemarketer.mvc.annotation.Service;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 @Service
-@Path("/")
+@WebPath("/")
 public class HelloWorldService {
 
-    @Path
-    public JsonResponse helloWorld() {
+    @WebPath(value = "/", method = HttpMethod.GET)
+    public JsonResponse helloWorld(@QueryParam("name") String name) {
         Map<String, String> obj = new TreeMap<String, String>();
-        obj.put("hello", "world");
+        obj.put("hello", name);
         return new JsonResponse(Status.SUCCESS_200, obj);
     }
 
     public static void main(String[] args) {
-        // 第二个参数为需要注册为控制器的的包下的随意一个类
-        TelemarketerStartup.run(args, HelloWorldService.class);
+        // 第二个参数为需要注册为控制器的的包下的随意一个类 可以使用多个
+        TelemarketerStartup.run(new String[]{"start"}, HelloWorldService.class);
     }
 }
+
 
 ```
 
 #MVC使用方式(目前只实现了C)
 使用`@Service`标注控制器
-使用`@Path`标注路径
+使用`@WebPath`标注路径
 
 使用`@FormParam`注入form数据，`@QueryParam`注入query数据，`@MultiPart`注入MultiplePart数据
 HttpServletRequest 无需标注即可注入，其他参数默认当成javabean使用参数绑定机制
 
 目前必须返回com.telemarket.telemarketer.http.responses.Response
 
+#Licence
+Telemarketer is released under the [MIT License](http://www.opensource.org/licenses/MIT).
